@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { Id } from "../convex/_generated/dataModel";
 import { Map } from "../components/Map";
+import { StreetView } from "../components/StreetView";
 import { PlayerList } from "../components/PlayerList";
 import { getSessionId } from "../utils";
 
@@ -23,6 +24,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
   );
 
   const addLocation = useMutation(api.locations.add);
+  const removeLocation = useMutation(api.locations.remove);
   const setReady = useMutation(api.players.setReady);
 
   const [selectedLocation, setSelectedLocation] = useState<{
@@ -55,6 +57,16 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
     }
   };
 
+  const handleRemoveLocation = async (locationId: Id<"locations">) => {
+    if (!currentPlayer?.isReady) {
+      try {
+        await removeLocation({ locationId });
+      } catch (err) {
+        alert(err instanceof Error ? err.message : "Ошибка удаления");
+      }
+    }
+  };
+
   const handleToggleReady = async () => {
     if (!currentPlayer) return;
     try {
@@ -77,7 +89,8 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
 
   const locationsNeeded = game.settings.locationsPerPlayer;
   const locationsCount = myLocations?.length ?? 0;
-  const allReady = players.every((p) => p.isReady);
+  const participatingPlayers = players.filter((p) => p.isParticipating);
+  const allReady = participatingPlayers.every((p) => p.isReady);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 p-4">
@@ -95,7 +108,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
               <h2 className="text-xl font-semibold mb-4">
                 Добавить локацию ({locationsCount}/{locationsNeeded})
               </h2>
-              
+
               {game.googleApiKey ? (
                 <Map
                   apiKey={game.googleApiKey}
@@ -109,6 +122,17 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
               ) : (
                 <div className="h-96 flex items-center justify-center bg-gray-100 rounded">
                   <p className="text-gray-500">Загрузка карты...</p>
+                </div>
+              )}
+
+              {selectedLocation && game.googleApiKey && (
+                <div className="mt-4">
+                  <h3 className="text-lg font-semibold mb-2">Предпросмотр панорамы:</h3>
+                  <StreetView
+                    apiKey={game.googleApiKey}
+                    lat={selectedLocation.lat}
+                    lng={selectedLocation.lng}
+                  />
                 </div>
               )}
 
@@ -147,12 +171,22 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
                   {myLocations?.map((loc) => (
                     <div
                       key={loc._id}
-                      className="p-2 bg-gray-50 rounded flex justify-between"
+                      className="p-2 bg-gray-50 rounded flex justify-between items-center"
                     >
-                      <span>{loc.hint}</span>
-                      <span className="text-sm text-gray-500">
-                        {loc.lat.toFixed(2)}, {loc.lng.toFixed(2)}
-                      </span>
+                      <div className="flex-1">
+                        <span>{loc.hint}</span>
+                        <span className="text-sm text-gray-500 ml-2">
+                          ({loc.lat.toFixed(2)}, {loc.lng.toFixed(2)})
+                        </span>
+                      </div>
+                      {!currentPlayer.isReady && (
+                        <button
+                          onClick={() => handleRemoveLocation(loc._id)}
+                          className="ml-2 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+                        >
+                          Удалить
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>

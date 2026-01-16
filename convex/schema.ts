@@ -23,6 +23,7 @@ export default defineSchema({
     gameId: v.id("games"),
     name: v.string(),
     isHost: v.boolean(),
+    isParticipating: v.optional(v.boolean()),
     isReady: v.boolean(),
     totalScore: v.number(),
     sessionId: v.string(),

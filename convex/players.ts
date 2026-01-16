@@ -32,6 +32,7 @@ export const join = mutation({
       gameId: args.gameId,
       name: args.name,
       isHost: false,
+      isParticipating: true,
       isReady: false,
       totalScore: 0,
       sessionId: args.sessionId,

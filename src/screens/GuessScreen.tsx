@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { Id } from "../convex/_generated/dataModel";
 import { Map } from "../components/Map";
+import { StreetView } from "../components/StreetView";
 import { getSessionId } from "../utils";
 
 interface GuessScreenProps {
@@ -27,12 +28,12 @@ export const GuessScreen: React.FC<GuessScreenProps> = ({ gameId }) => {
   const [selectedLocation, setSelectedLocation] = useState<{
     lat: number;
     lng: number;
-  } | null>(
-    myGuess ? { lat: myGuess.lat, lng: myGuess.lng } : null
-  );
+  } | null>(null);
 
   const handleMapClick = (lat: number, lng: number) => {
-    setSelectedLocation({ lat, lng });
+    if (!myGuess) {
+      setSelectedLocation({ lat, lng });
+    }
   };
 
   const handleSubmitGuess = async () => {
@@ -48,7 +49,6 @@ export const GuessScreen: React.FC<GuessScreenProps> = ({ gameId }) => {
         lng: selectedLocation.lng,
         round: game.currentRound,
       });
-      // Guess submitted - will be handled by parent component
     } catch (err) {
       alert(err instanceof Error ? err.message : "Ошибка отправки");
     }
@@ -62,22 +62,34 @@ export const GuessScreen: React.FC<GuessScreenProps> = ({ gameId }) => {
     );
   }
 
-  const hasSubmitted = myGuess !== undefined;
+  const hasSubmitted = myGuess !== undefined && myGuess !== null;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-100 p-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
           <h1 className="text-3xl font-bold mb-2">Раунд {game.currentRound ?? 1}</h1>
           <p className="text-xl text-gray-700 mb-4 font-medium">
             Подсказка: {activeLocation.hint}
           </p>
           <p className="text-sm text-gray-500">
-            Кликните на карте, где, по вашему мнению, находится это место
+            Посмотрите на панораму и отметьте на карте, где это находится
           </p>
         </div>
 
+        {game.googleApiKey && (
+          <div className="bg-white rounded-lg shadow-lg p-4 mb-4">
+            <h2 className="text-xl font-semibold mb-4">Панорама местности:</h2>
+            <StreetView
+              apiKey={game.googleApiKey}
+              lat={activeLocation.lat}
+              lng={activeLocation.lng}
+            />
+          </div>
+        )}
+
         <div className="bg-white rounded-lg shadow-lg p-4 mb-4">
+          <h2 className="text-xl font-semibold mb-4">Ваше предположение:</h2>
           {game.googleApiKey ? (
             <Map
               apiKey={game.googleApiKey}

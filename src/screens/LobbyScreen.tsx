@@ -17,6 +17,8 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
     { gameId, sessionId: getSessionId() }
   );
   const startSetup = useMutation(api.games.startSetup);
+  const setParticipating = useMutation(api.admin.setParticipating);
+  const resetGame = useMutation(api.admin.resetGame);
 
   const [playerName, setPlayerName] = useState("");
   const [joinError, setJoinError] = useState<string | null>(null);
@@ -45,6 +47,29 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
       await startSetup({ gameId });
     } catch (err) {
       alert(err instanceof Error ? err.message : "Ошибка запуска");
+    }
+  };
+
+  const handleToggleParticipating = async () => {
+    if (!currentPlayer?.isHost) return;
+    try {
+      await setParticipating({
+        playerId: currentPlayer._id,
+        isParticipating: !currentPlayer.isParticipating,
+      });
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Ошибка");
+    }
+  };
+
+  const handleResetGame = async () => {
+    if (!confirm("Вы уверены, что хотите сбросить игру? Все данные будут удалены.")) {
+      return;
+    }
+    try {
+      await resetGame({ gameId });
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Ошибка сброса");
     }
   };
 
@@ -120,8 +145,20 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
           currentPlayerId={currentPlayer?._id}
         />
 
-        {isHost && (
-          <div className="mt-4">
+        {isHost && currentPlayer && (
+          <div className="mt-4 space-y-4">
+            <div className="bg-white rounded-lg shadow-lg p-4">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={currentPlayer.isParticipating}
+                  onChange={handleToggleParticipating}
+                  className="w-5 h-5"
+                />
+                <span className="text-gray-700">Я буду участвовать в игре (добавлять локации и угадывать)</span>
+              </label>
+            </div>
+
             <button
               onClick={handleStartSetup}
               disabled={players.length < 2}
@@ -130,6 +167,13 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
               {players.length < 2
                 ? "Нужно минимум 2 игрока"
                 : "Начать настройку локаций"}
+            </button>
+
+            <button
+              onClick={handleResetGame}
+              className="w-full px-6 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700"
+            >
+              Сбросить игру
             </button>
           </div>
         )}

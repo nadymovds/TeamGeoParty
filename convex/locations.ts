@@ -60,3 +60,10 @@ export const getActive = query({
     return await ctx.db.get(game.activeLocationId);
   },
 });
+
+export const remove = mutation({
+  args: { locationId: v.id("locations") },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.locationId);
+  },
+});

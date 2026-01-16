@@ -21,6 +21,7 @@ export const create = mutation({
       gameId,
       name: args.hostName,
       isHost: true,
+      isParticipating: true,
       isReady: false,
       totalScore: 0,
       sessionId: args.sessionId,
