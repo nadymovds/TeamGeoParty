@@ -24,6 +24,7 @@ export const GuessScreen: React.FC<GuessScreenProps> = ({ gameId }) => {
       : "skip"
   );
   const submitGuess = useMutation(api.guesses.submit);
+  const resetGame = useMutation(api.admin.resetGame);
 
   const [selectedLocation, setSelectedLocation] = useState<{
     lat: number;
@@ -51,6 +52,17 @@ export const GuessScreen: React.FC<GuessScreenProps> = ({ gameId }) => {
       });
     } catch (err) {
       alert(err instanceof Error ? err.message : "Ошибка отправки");
+    }
+  };
+
+  const handleResetGame = async () => {
+    if (!confirm("Вы уверены, что хотите сбросить игру? Все данные будут удалены и игра вернётся в лобби.")) {
+      return;
+    }
+    try {
+      await resetGame({ gameId });
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Ошибка сброса");
     }
   };
 
@@ -133,6 +145,17 @@ export const GuessScreen: React.FC<GuessScreenProps> = ({ gameId }) => {
             <p className="text-center text-green-700 font-semibold">
               ✓ Ваш ответ отправлен! Ожидайте других игроков...
             </p>
+          </div>
+        )}
+
+        {currentPlayer?.isHost && (
+          <div className="mt-4">
+            <button
+              onClick={handleResetGame}
+              className="w-full px-4 py-2 bg-red-100 text-red-700 rounded-lg font-medium hover:bg-red-200 border border-red-300 transition-colors"
+            >
+              Сбросить игру
+            </button>
           </div>
         )}
       </div>

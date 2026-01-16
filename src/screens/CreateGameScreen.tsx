@@ -69,17 +69,24 @@ export const CreateGameScreen: React.FC = () => {
               placeholder="AIza..."
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
-            <p className="text-xs text-gray-500 mt-1">
-              Получить ключ можно на{" "}
-              <a
-                href="https://console.cloud.google.com/google/maps-apis"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-indigo-600 hover:underline"
-              >
-                Google Cloud Console
-              </a>
-            </p>
+            <div className="mt-2 p-3 bg-indigo-50 rounded-lg">
+              <p className="text-xs font-medium text-indigo-800 mb-2">Как получить ключ:</p>
+              <ol className="text-xs text-indigo-700 space-y-1 list-decimal list-inside">
+                <li>Откройте <a
+                  href="https://console.cloud.google.com/google/maps-apis"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-indigo-600 hover:underline font-medium"
+                >Google Cloud Console</a></li>
+                <li>Создайте проект (или выберите существующий)</li>
+                <li>Включите APIs: <span className="font-medium">Maps JavaScript API</span> и <span className="font-medium">Street View Static API</span></li>
+                <li>Перейдите в "Credentials" → "Create Credentials" → "API Key"</li>
+                <li>Скопируйте ключ (начинается с AIza...)</li>
+              </ol>
+              <p className="text-xs text-indigo-600 mt-2">
+                Новым пользователям Google Cloud даёт $300 бесплатного кредита.
+              </p>
+            </div>
           </div>
 
           <div>

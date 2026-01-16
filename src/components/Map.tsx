@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from "react";
-import { GoogleMap, Marker, LoadScript } from "@react-google-maps/api";
+import { GoogleMap, Marker, LoadScript, InfoWindow } from "@react-google-maps/api";
 
 const containerStyle = {
   width: "100%",
@@ -11,10 +11,17 @@ const defaultCenter = {
   lng: 0,
 };
 
+interface MapMarker {
+  lat: number;
+  lng: number;
+  label?: string;
+  title?: string; // Подпись под маркером
+}
+
 interface MapProps {
   apiKey: string;
   center?: { lat: number; lng: number };
-  markers?: Array<{ lat: number; lng: number; label?: string }>;
+  markers?: MapMarker[];
   onClick?: (lat: number, lng: number) => void;
   zoom?: number;
 }
@@ -58,11 +65,25 @@ export const Map: React.FC<MapProps> = ({
         options={mapOptions}
       >
         {markers.map((marker, index) => (
-          <Marker
-            key={index}
-            position={{ lat: marker.lat, lng: marker.lng }}
-            label={marker.label}
-          />
+          <React.Fragment key={index}>
+            <Marker
+              position={{ lat: marker.lat, lng: marker.lng }}
+              label={marker.label}
+            />
+            {marker.title && (
+              <InfoWindow
+                position={{ lat: marker.lat, lng: marker.lng }}
+                options={{
+                  pixelOffset: new window.google.maps.Size(0, 30),
+                  disableAutoPan: true,
+                }}
+              >
+                <div className="px-2 py-1 text-xs font-medium text-gray-800 whitespace-nowrap">
+                  {marker.title}
+                </div>
+              </InfoWindow>
+            )}
+          </React.Fragment>
         ))}
       </GoogleMap>
     </LoadScript>

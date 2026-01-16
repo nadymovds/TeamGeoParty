@@ -18,11 +18,21 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
   );
   const startSetup = useMutation(api.games.startSetup);
   const setParticipating = useMutation(api.admin.setParticipating);
-  const resetGame = useMutation(api.admin.resetGame);
 
   const [playerName, setPlayerName] = useState("");
   const [joinError, setJoinError] = useState<string | null>(null);
+  const [showCopyToast, setShowCopyToast] = useState(false);
   const joinGame = useMutation(api.players.join);
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(createGameUrl(gameId));
+      setShowCopyToast(true);
+      setTimeout(() => setShowCopyToast(false), 2000);
+    } catch (err) {
+      alert("Не удалось скопировать ссылку");
+    }
+  };
 
   const handleJoin = async () => {
     if (!playerName.trim()) {
@@ -62,16 +72,6 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
     }
   };
 
-  const handleResetGame = async () => {
-    if (!confirm("Вы уверены, что хотите сбросить игру? Все данные будут удалены.")) {
-      return;
-    }
-    try {
-      await resetGame({ gameId });
-    } catch (err) {
-      alert(err instanceof Error ? err.message : "Ошибка сброса");
-    }
-  };
 
   if (!game || !players) {
     return (
@@ -97,7 +97,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
             <p className="text-sm font-medium text-gray-700 mb-2">
               Пригласите друзей по ссылке:
             </p>
-            <div className="flex gap-2">
+            <div className="flex gap-2 relative">
               <input
                 type="text"
                 value={gameUrl}
@@ -106,12 +106,17 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
                 onClick={(e) => (e.target as HTMLInputElement).select()}
               />
               <button
-                onClick={() => navigator.clipboard.writeText(gameUrl)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                onClick={handleCopyLink}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 hover:shadow-md active:bg-blue-800 transition-all duration-150"
               >
                 Копировать
               </button>
             </div>
+            {showCopyToast && (
+              <div className="mt-2 py-2 px-3 bg-green-100 text-green-700 text-sm rounded-lg border border-green-300 animate-pulse">
+                ✓ Ссылка скопирована в буфер обмена
+              </div>
+            )}
           </div>
         </div>
 
@@ -169,12 +174,6 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
                 : "Начать настройку локаций"}
             </button>
 
-            <button
-              onClick={handleResetGame}
-              className="w-full px-6 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700"
-            >
-              Сбросить игру
-            </button>
           </div>
         )}
       </div>

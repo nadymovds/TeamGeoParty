@@ -27,6 +27,7 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
   const finishRound = useMutation(api.games.finishRound);
   const startRound = useMutation(api.games.startRound);
   const finishGame = useMutation(api.games.finishGame);
+  const resetGame = useMutation(api.admin.resetGame);
   const locations = useQuery(api.locations.list, { gameId });
 
   // Sort locations to ensure consistent order
@@ -51,12 +52,17 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
       lat: activeLocation.lat,
       lng: activeLocation.lng,
       label: "🎯",
+      title: "Правильное место",
     },
-    ...guesses.map((guess) => ({
-      lat: guess.lat,
-      lng: guess.lng,
-      label: "?",
-    })),
+    ...guesses.map((guess) => {
+      const player = players.find((p) => p._id === guess.playerId);
+      return {
+        lat: guess.lat,
+        lng: guess.lng,
+        label: "📍",
+        title: player?.name ?? "Игрок",
+      };
+    }),
   ];
 
   // Sort guesses by distance
@@ -93,6 +99,17 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
     sortedLocations &&
     game.currentRound &&
     game.currentRound >= sortedLocations.length;
+
+  const handleResetGame = async () => {
+    if (!confirm("Вы уверены, что хотите сбросить игру? Все данные будут удалены и игра вернётся в лобби.")) {
+      return;
+    }
+    try {
+      await resetGame({ gameId });
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Ошибка сброса");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 p-4">
@@ -163,7 +180,7 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
         <ScoreTable players={players} />
 
         {currentPlayer?.isHost && (
-          <div className="mt-4">
+          <div className="mt-4 space-y-3">
             {allLocationsPlayed ? (
               <button
                 onClick={async () => {
@@ -181,6 +198,12 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
                 Следующий раунд
               </button>
             )}
+            <button
+              onClick={handleResetGame}
+              className="w-full px-4 py-2 bg-red-100 text-red-700 rounded-lg font-medium hover:bg-red-200 border border-red-300 transition-colors"
+            >
+              Сбросить игру
+            </button>
           </div>
         )}
 
