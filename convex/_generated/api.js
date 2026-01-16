@@ -1,5 +1,3 @@
-/* prettier-ignore-start */
-
 /* eslint-disable */
 /**
  * Generated `api` utility.
@@ -7,9 +5,10 @@
  * THIS CODE IS AUTOMATICALLY GENERATED.
  *
  * To regenerate, run `npx convex dev`.
- *
  * @module
  */
+
+import { anyApi, componentsGeneric } from "convex/server";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -19,30 +18,6 @@
  * const myFunctionReference = api.myModule.myFunction;
  * ```
  */
-const fullApi = undefined;
-
-export const api = new Proxy({}, {
-  get: (_target, mod) => {
-    return new Proxy({}, {
-      get: (_target, func) => {
-        return {
-          _name: `${String(mod)}:${String(func)}`,
-        };
-      },
-    });
-  },
-});
-
-export const internal = new Proxy({}, {
-  get: (_target, mod) => {
-    return new Proxy({}, {
-      get: (_target, func) => {
-        return {
-          _name: `${String(mod)}:${String(func)}`,
-        };
-      },
-    });
-  },
-});
-
-/* prettier-ignore-end */
+export const api = anyApi;
+export const internal = anyApi;
+export const components = componentsGeneric();
