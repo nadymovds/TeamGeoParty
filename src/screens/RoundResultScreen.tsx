@@ -1,7 +1,7 @@
 import React from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
-import { Id } from "convex/values";
+import { Id } from "../convex/_generated/dataModel";
 import { Map } from "../components/Map";
 import { ScoreTable } from "../components/ScoreTable";
 import { getSessionId } from "../utils";
@@ -63,7 +63,6 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
   // Sort guesses by distance
   const sortedGuesses = [...guesses].sort((a, b) => a.distance - b.distance);
 
-
   const handleNextRound = async () => {
     if (!currentPlayer?.isHost || !sortedLocations) return;
 
@@ -90,7 +89,6 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
       });
     }, 500);
   };
-
 
   const allLocationsPlayed =
     sortedLocations &&

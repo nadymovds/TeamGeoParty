@@ -1,16 +1,15 @@
 import React, { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
-import { Id } from "convex/values";
+import { Id } from "../convex/_generated/dataModel";
 import { PlayerList } from "../components/PlayerList";
 import { getSessionId, createGameUrl } from "../utils";
 
 interface LobbyScreenProps {
   gameId: Id<"games">;
-  playerId?: Id<"players">;
 }
 
-export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId, playerId }) => {
+export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
   const game = useQuery(api.games.get, { gameId });
   const players = useQuery(api.players.list, { gameId });
   const currentPlayer = useQuery(

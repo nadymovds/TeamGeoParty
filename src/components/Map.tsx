@@ -27,9 +27,11 @@ export const Map: React.FC<MapProps> = ({
   zoom = 2,
 }) => {
   const onMapClick = useCallback(
-    (e: google.maps.MapMouseEvent) => {
+    (e: google.maps.MapMouseEvent | google.maps.IconMouseEvent) => {
       if (onClick && e.latLng) {
-        onClick(e.latLng.lat(), e.latLng.lng());
+        const lat = e.latLng.lat();
+        const lng = e.latLng.lng();
+        onClick(lat, lng);
       }
     },
     [onClick]

@@ -1,5 +1,5 @@
 import React from "react";
-import { Id } from "convex/values";
+import { Id } from "../convex/_generated/dataModel";
 
 interface Player {
   _id: Id<"players">;

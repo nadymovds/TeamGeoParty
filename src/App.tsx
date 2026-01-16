@@ -9,8 +9,8 @@ import { RoundResultScreen } from "./screens/RoundResultScreen";
 import { FinalScreen } from "./screens/FinalScreen";
 import { getGameIdFromUrl } from "./utils";
 import { useQuery, useMutation } from "convex/react";
-import { api } from "./convex/_generated/api";
-import { Id } from "convex/values";
+import { api } from "../convex/_generated/api";
+import { Id } from "../convex/_generated/dataModel";
 
 const GameRouter: React.FC = () => {
   const gameIdFromUrl = getGameIdFromUrl();
