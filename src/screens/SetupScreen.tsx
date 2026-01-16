@@ -15,8 +15,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
   const players = useQuery(api.players.list, { gameId });
   const currentPlayer = useQuery(
     api.players.getBySession,
-    { gameId, sessionId: getSessionId() },
-    "skip"
+    { gameId, sessionId: getSessionId() }
   );
   const myLocations = useQuery(
     api.locations.getByPlayer,

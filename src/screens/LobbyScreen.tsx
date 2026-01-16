@@ -14,8 +14,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
   const players = useQuery(api.players.list, { gameId });
   const currentPlayer = useQuery(
     api.players.getBySession,
-    { gameId, sessionId: getSessionId() },
-    "skip"
+    { gameId, sessionId: getSessionId() }
   );
   const startSetup = useMutation(api.games.startSetup);
 
@@ -58,7 +57,6 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
   }
 
   const isHost = currentPlayer?.isHost ?? false;
-  const allReady = players.length > 0 && players.every((p) => p.isReady);
   const gameUrl = createGameUrl(gameId);
 
   return (

@@ -14,8 +14,7 @@ export const GuessScreen: React.FC<GuessScreenProps> = ({ gameId }) => {
   const activeLocation = useQuery(api.locations.getActive, { gameId });
   const currentPlayer = useQuery(
     api.players.getBySession,
-    { gameId, sessionId: getSessionId() },
-    "skip"
+    { gameId, sessionId: getSessionId() }
   );
   const myGuess = useQuery(
     api.guesses.getByPlayer,

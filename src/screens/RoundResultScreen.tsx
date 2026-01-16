@@ -22,8 +22,7 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
   const players = useQuery(api.players.list, { gameId });
   const currentPlayer = useQuery(
     api.players.getBySession,
-    { gameId, sessionId: getSessionId() },
-    "skip"
+    { gameId, sessionId: getSessionId() }
   );
   const finishRound = useMutation(api.games.finishRound);
   const startRound = useMutation(api.games.startRound);
