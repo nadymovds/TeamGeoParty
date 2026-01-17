@@ -10,7 +10,7 @@ import { FinalScreen } from "./screens/FinalScreen";
 import { getGameIdFromUrl, getSessionId } from "./utils";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
-import { Id } from "../convex/_generated/dataModel";
+import { Id, Doc } from "../convex/_generated/dataModel";
 import { GoogleMapsProvider } from "./contexts/GoogleMapsContext";
 
 const GameRouter: React.FC = () => {
@@ -25,6 +25,28 @@ const GameRouter: React.FC = () => {
 
 const GameContent: React.FC<{ gameId: Id<"games"> }> = ({ gameId }) => {
   const game = useQuery(api.games.get, { gameId });
+
+  if (!game) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl">Загрузка игры...</div>
+      </div>
+    );
+  }
+
+  return (
+    <GoogleMapsProvider apiKey={game.googleApiKey}>
+      <GameContentInner game={game} gameId={gameId} />
+    </GoogleMapsProvider>
+  );
+};
+
+interface GameContentInnerProps {
+  game: Doc<"games">;
+  gameId: Id<"games">;
+}
+
+const GameContentInner: React.FC<GameContentInnerProps> = ({ game, gameId }) => {
   const players = useQuery(api.players.list, { gameId });
   const locations = useQuery(api.locations.list, { gameId });
   const startRound = useMutation(api.games.startRound);
@@ -50,7 +72,7 @@ const GameContent: React.FC<{ gameId: Id<"games"> }> = ({ gameId }) => {
   // Auto-start first round when all players are ready and game is in SETUP
   useEffect(() => {
     if (
-      game?.status === "SETUP" &&
+      game.status === "SETUP" &&
       players &&
       locations &&
       players.every((p) => p.isReady) &&
@@ -61,7 +83,7 @@ const GameContent: React.FC<{ gameId: Id<"games"> }> = ({ gameId }) => {
         a.hint.localeCompare(b.hint)
       );
 
-      // Small delay to ensure Convex state is settled
+      // Increased delay to ensure Google Maps API is loaded
       const timer = setTimeout(async () => {
         const firstLocation = sortedLocations[0];
         if (firstLocation) {
@@ -71,22 +93,22 @@ const GameContent: React.FC<{ gameId: Id<"games"> }> = ({ gameId }) => {
             round: 1,
           });
         }
-      }, 100);
+      }, 500);
       return () => clearTimeout(timer);
     }
-  }, [game?.status, players, locations, gameId, startRound]);
+  }, [game.status, players, locations, gameId, startRound]);
 
   // Auto-finish round when all players have guessed
   const guesses = useQuery(
     api.guesses.list,
-    game?.activeLocationId
+    game.activeLocationId
       ? { locationId: game.activeLocationId }
       : "skip"
   );
 
   useEffect(() => {
     if (
-      game?.status === "PLAYING" &&
+      game.status === "PLAYING" &&
       players &&
       guesses &&
       game.activeLocationId &&
@@ -98,12 +120,12 @@ const GameContent: React.FC<{ gameId: Id<"games"> }> = ({ gameId }) => {
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [game?.status, players, guesses, game?.activeLocationId, gameId, finishRound]);
+  }, [game.status, players, guesses, game.activeLocationId, gameId, finishRound]);
 
   // Auto-finish game when all locations are played
   useEffect(() => {
     if (
-      game?.status === "RESULTS" &&
+      game.status === "RESULTS" &&
       locations &&
       game.currentRound &&
       game.currentRound >= locations.length
@@ -113,17 +135,8 @@ const GameContent: React.FC<{ gameId: Id<"games"> }> = ({ gameId }) => {
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [game?.status, game?.currentRound, locations, gameId, finishGame]);
+  }, [game.status, game.currentRound, locations, gameId, finishGame]);
 
-  if (!game) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Загрузка игры...</div>
-      </div>
-    );
-  }
-
-  // Wrap screens in GoogleMapsProvider with API key from game
   const renderScreen = () => {
     switch (game.status) {
       case "LOBBY":
@@ -145,11 +158,7 @@ const GameContent: React.FC<{ gameId: Id<"games"> }> = ({ gameId }) => {
     }
   };
 
-  return (
-    <GoogleMapsProvider apiKey={game.googleApiKey}>
-      {renderScreen()}
-    </GoogleMapsProvider>
-  );
+  return renderScreen();
 };
 
 function App() {

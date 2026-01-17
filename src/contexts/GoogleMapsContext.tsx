@@ -1,5 +1,5 @@
 import React, { createContext, useContext, ReactNode } from "react";
-import { useJsApiLoader } from "@react-google-maps/api";
+import { useJsApiLoader, Libraries } from "@react-google-maps/api";
 
 interface GoogleMapsContextType {
   isLoaded: boolean;
@@ -23,12 +23,15 @@ interface GoogleMapsProviderProps {
   children: ReactNode;
 }
 
+const libraries: Libraries = ["geometry", "places"];
+
 export const GoogleMapsProvider: React.FC<GoogleMapsProviderProps> = ({
   apiKey,
   children,
 }) => {
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: apiKey,
+    libraries,
   });
 
   return (

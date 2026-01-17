@@ -6,12 +6,14 @@ import { Map } from "../components/Map";
 import { StreetView } from "../components/StreetView";
 import { HostMenu } from "../components/HostMenu";
 import { getSessionId } from "../utils";
+import { useGoogleMaps } from "../contexts/GoogleMapsContext";
 
 interface GuessScreenProps {
   gameId: Id<"games">;
 }
 
 export const GuessScreen: React.FC<GuessScreenProps> = ({ gameId }) => {
+  const { isLoaded } = useGoogleMaps();
   const game = useQuery(api.games.get, { gameId });
   const activeLocation = useQuery(api.locations.getActive, { gameId });
   const currentPlayer = useQuery(
@@ -55,10 +57,12 @@ export const GuessScreen: React.FC<GuessScreenProps> = ({ gameId }) => {
     }
   };
 
-  if (!game || !activeLocation || !currentPlayer) {
+  if (!game || !activeLocation || !currentPlayer || !isLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Загрузка...</div>
+        <div className="text-xl">
+          {!isLoaded ? "Загрузка карт..." : "Загрузка..."}
+        </div>
       </div>
     );
   }

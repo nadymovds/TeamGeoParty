@@ -7,12 +7,14 @@ import { StreetView } from "../components/StreetView";
 import { PlayerList } from "../components/PlayerList";
 import { HostMenu } from "../components/HostMenu";
 import { getSessionId } from "../utils";
+import { useGoogleMaps } from "../contexts/GoogleMapsContext";
 
 interface SetupScreenProps {
   gameId: Id<"games">;
 }
 
 export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
+  const { isLoaded } = useGoogleMaps();
   const game = useQuery(api.games.get, { gameId });
   const players = useQuery(api.players.list, { gameId });
   const currentPlayer = useQuery(
@@ -80,10 +82,12 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
     }
   };
 
-  if (!game || !players || !currentPlayer) {
+  if (!game || !players || !currentPlayer || !isLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Загрузка...</div>
+        <div className="text-xl">
+          {!isLoaded ? "Загрузка карт..." : "Загрузка..."}
+        </div>
       </div>
     );
   }

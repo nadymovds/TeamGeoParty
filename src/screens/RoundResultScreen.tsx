@@ -6,6 +6,7 @@ import { Map } from "../components/Map";
 import { ScoreTable } from "../components/ScoreTable";
 import { HostMenu } from "../components/HostMenu";
 import { getSessionId } from "../utils";
+import { useGoogleMaps } from "../contexts/GoogleMapsContext";
 
 interface RoundResultScreenProps {
   gameId: Id<"games">;
@@ -14,6 +15,7 @@ interface RoundResultScreenProps {
 export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
   gameId,
 }) => {
+  const { isLoaded } = useGoogleMaps();
   const game = useQuery(api.games.get, { gameId });
   const activeLocation = useQuery(api.locations.getActive, { gameId });
   const guesses = useQuery(
@@ -35,10 +37,12 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
       })
     : null;
 
-  if (!game || !activeLocation || !players || !guesses) {
+  if (!game || !activeLocation || !players || !guesses || !isLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Загрузка...</div>
+        <div className="text-xl">
+          {!isLoaded ? "Загрузка карт..." : "Загрузка..."}
+        </div>
       </div>
     );
   }
