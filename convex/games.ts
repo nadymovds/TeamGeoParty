@@ -128,129 +128,151 @@ export const finishGame = mutation({
 export const forceNextRound = mutation({
   args: { gameId: v.id("games") },
   handler: async (ctx, args) => {
-    const game = await ctx.db.get(args.gameId);
-    if (!game) {
-      throw new Error("Game not found");
-    }
-
-    // Get all locations sorted consistently
-    const locations = await ctx.db
-      .query("locations")
-      .withIndex("by_game", (q) => q.eq("gameId", args.gameId))
-      .collect();
-
-    if (locations.length === 0) {
-      throw new Error("No locations found for this game");
-    }
-
-    const sortedLocations = [...locations].sort((a, b) =>
-      a.hint.localeCompare(b.hint)
-    );
-
-    // Get all players and filter participating ones
-    const allPlayers = await ctx.db
-      .query("players")
-      .withIndex("by_game", (q) => q.eq("gameId", args.gameId))
-      .collect();
-
-    // Filter participating players (handle optional field safely)
-    const players = allPlayers.filter(p => p.isParticipating !== false);
-
-    if (game.status === "PLAYING" && game.activeLocationId) {
-      // Create dummy guesses for players who haven't guessed yet
-      const guesses = await ctx.db
-        .query("guesses")
-        .withIndex("by_location", (q) => q.eq("locationId", game.activeLocationId!))
-        .collect();
-
-      const playersWhoGuessed = new Set(guesses.map((g) => g.playerId));
-
-      for (const player of players) {
-        if (!playersWhoGuessed.has(player._id)) {
-          // Create a dummy guess with maximum distance (0 points)
-          await ctx.db.insert("guesses", {
-            locationId: game.activeLocationId,
-            playerId: player._id,
-            lat: 0,
-            lng: 0,
-            distance: 99999,
-            round: game.currentRound ?? 1,
-          });
-        }
+    try {
+      const game = await ctx.db.get(args.gameId);
+      if (!game) {
+        throw new Error("Game not found");
       }
 
-      // Finish the current round (calculates scores)
-      await ctx.db.patch(args.gameId, {
-        status: "RESULTS",
-      });
-
-      // Calculate scores for all guesses (including dummy ones)
-      const allGuesses = await ctx.db
-        .query("guesses")
-        .withIndex("by_location", (q) => q.eq("locationId", game.activeLocationId!))
+      // Get all locations sorted consistently
+      const locations = await ctx.db
+        .query("locations")
+        .withIndex("by_game", (q) => q.eq("gameId", args.gameId))
         .collect();
 
-      const maxDistance = 20000;
-      const maxPoints = 1000;
+      if (locations.length === 0) {
+        throw new Error("No locations found for this game");
+      }
 
-      for (const guess of allGuesses) {
-        const points = Math.max(
-          0,
-          Math.floor(maxPoints * (1 - guess.distance / maxDistance))
+      const sortedLocations = [...locations].sort((a, b) =>
+        a.hint.localeCompare(b.hint)
+      );
+
+      // Get all players and filter participating ones
+      const allPlayers = await ctx.db
+        .query("players")
+        .withIndex("by_game", (q) => q.eq("gameId", args.gameId))
+        .collect();
+
+      // Filter participating players (handle optional field safely)
+      const players = allPlayers.filter(p => p.isParticipating !== false);
+
+      if (game.status === "PLAYING" && game.activeLocationId) {
+        // Explicitly check activeLocationId exists
+        const activeLocationId = game.activeLocationId;
+        if (!activeLocationId) {
+          throw new Error("No active location in PLAYING state");
+        }
+
+        // Create dummy guesses for players who haven't guessed yet
+        const guesses = await ctx.db
+          .query("guesses")
+          .withIndex("by_location", (q) => q.eq("locationId", activeLocationId))
+          .collect();
+
+        const playersWhoGuessed = new Set(guesses.map((g) => g.playerId));
+
+        for (const player of players) {
+          if (!playersWhoGuessed.has(player._id)) {
+            // Create a dummy guess with maximum distance (0 points)
+            await ctx.db.insert("guesses", {
+              locationId: activeLocationId,
+              playerId: player._id,
+              lat: 0,
+              lng: 0,
+              distance: 99999,
+              round: game.currentRound ?? 1,
+            });
+          }
+        }
+
+        // Finish the current round (calculates scores)
+        await ctx.db.patch(args.gameId, {
+          status: "RESULTS",
+        });
+
+        // Calculate scores for all guesses (including dummy ones)
+        const allGuesses = await ctx.db
+          .query("guesses")
+          .withIndex("by_location", (q) => q.eq("locationId", activeLocationId))
+          .collect();
+
+        const maxDistance = 20000;
+        const maxPoints = 1000;
+
+        for (const guess of allGuesses) {
+          const points = Math.max(
+            0,
+            Math.floor(maxPoints * (1 - guess.distance / maxDistance))
+          );
+
+          // Validate points is a finite number
+          if (!Number.isFinite(points)) {
+            console.error("Invalid points calculated:", points, "for guess:", guess);
+            continue;
+          }
+
+          const player = await ctx.db.get(guess.playerId);
+          if (player) {
+            const newScore = player.totalScore + points;
+            if (!Number.isFinite(newScore)) {
+              console.error("Invalid new score:", newScore, "for player:", player);
+              continue;
+            }
+            await ctx.db.patch(guess.playerId, {
+              totalScore: newScore,
+            });
+          }
+        }
+
+        // Find next location
+        const currentIndex = sortedLocations.findIndex(
+          (loc) => loc._id === game.activeLocationId
         );
 
-        const player = await ctx.db.get(guess.playerId);
-        if (player) {
-          await ctx.db.patch(guess.playerId, {
-            totalScore: player.totalScore + points,
+        if (currentIndex !== -1 && currentIndex < sortedLocations.length - 1) {
+          const nextLocation = sortedLocations[currentIndex + 1];
+          // Start next round immediately
+          await ctx.db.patch(args.gameId, {
+            status: "PLAYING",
+            activeLocationId: nextLocation._id,
+            currentRound: (game.currentRound ?? 1) + 1,
+          });
+        } else {
+          // No more locations, finish game
+          await ctx.db.patch(args.gameId, {
+            status: "FINAL",
           });
         }
-      }
+      } else if (game.status === "RESULTS") {
+        // Currently in RESULTS, move to next round
+        if (!game.activeLocationId) {
+          throw new Error("No active location in RESULTS state");
+        }
 
-      // Find next location
-      const currentIndex = sortedLocations.findIndex(
-        (loc) => loc._id === game.activeLocationId
-      );
+        const currentIndex = sortedLocations.findIndex(
+          (loc) => loc._id === game.activeLocationId
+        );
 
-      if (currentIndex !== -1 && currentIndex < sortedLocations.length - 1) {
-        const nextLocation = sortedLocations[currentIndex + 1];
-        // Start next round immediately
-        await ctx.db.patch(args.gameId, {
-          status: "PLAYING",
-          activeLocationId: nextLocation._id,
-          currentRound: (game.currentRound ?? 1) + 1,
-        });
+        if (currentIndex !== -1 && currentIndex < sortedLocations.length - 1) {
+          const nextLocation = sortedLocations[currentIndex + 1];
+          await ctx.db.patch(args.gameId, {
+            status: "PLAYING",
+            activeLocationId: nextLocation._id,
+            currentRound: (game.currentRound ?? 1) + 1,
+          });
+        } else {
+          // No more locations, finish game
+          await ctx.db.patch(args.gameId, {
+            status: "FINAL",
+          });
+        }
       } else {
-        // No more locations, finish game
-        await ctx.db.patch(args.gameId, {
-          status: "FINAL",
-        });
+        throw new Error(`Cannot force next round from status: ${game.status}`);
       }
-    } else if (game.status === "RESULTS") {
-      // Currently in RESULTS, move to next round
-      if (!game.activeLocationId) {
-        throw new Error("No active location in RESULTS state");
-      }
-
-      const currentIndex = sortedLocations.findIndex(
-        (loc) => loc._id === game.activeLocationId
-      );
-
-      if (currentIndex !== -1 && currentIndex < sortedLocations.length - 1) {
-        const nextLocation = sortedLocations[currentIndex + 1];
-        await ctx.db.patch(args.gameId, {
-          status: "PLAYING",
-          activeLocationId: nextLocation._id,
-          currentRound: (game.currentRound ?? 1) + 1,
-        });
-      } else {
-        // No more locations, finish game
-        await ctx.db.patch(args.gameId, {
-          status: "FINAL",
-        });
-      }
-    } else {
-      throw new Error(`Cannot force next round from status: ${game.status}`);
+    } catch (error) {
+      console.error("Error in forceNextRound:", error);
+      throw error;
     }
   },
 });
@@ -258,9 +280,20 @@ export const forceNextRound = mutation({
 export const forceFinishGame = mutation({
   args: { gameId: v.id("games") },
   handler: async (ctx, args) => {
-    // Force finish game from any state
-    await ctx.db.patch(args.gameId, {
-      status: "FINAL",
-    });
+    try {
+      // Validate game exists
+      const game = await ctx.db.get(args.gameId);
+      if (!game) {
+        throw new Error("Game not found");
+      }
+
+      // Force finish game from any state
+      await ctx.db.patch(args.gameId, {
+        status: "FINAL",
+      });
+    } catch (error) {
+      console.error("Error in forceFinishGame:", error);
+      throw error;
+    }
   },
 });
