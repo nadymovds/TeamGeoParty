@@ -139,6 +139,10 @@ export const forceNextRound = mutation({
       .withIndex("by_game", (q) => q.eq("gameId", args.gameId))
       .collect();
 
+    if (locations.length === 0) {
+      throw new Error("No locations found for this game");
+    }
+
     const sortedLocations = [...locations].sort((a, b) =>
       a.hint.localeCompare(b.hint)
     );
@@ -168,7 +172,7 @@ export const forceNextRound = mutation({
             lat: 0,
             lng: 0,
             distance: 99999,
-            round: game.currentRound,
+            round: game.currentRound ?? 1,
           });
         }
       }
@@ -222,6 +226,10 @@ export const forceNextRound = mutation({
       }
     } else if (game.status === "RESULTS") {
       // Currently in RESULTS, move to next round
+      if (!game.activeLocationId) {
+        throw new Error("No active location in RESULTS state");
+      }
+
       const currentIndex = sortedLocations.findIndex(
         (loc) => loc._id === game.activeLocationId
       );
@@ -239,6 +247,8 @@ export const forceNextRound = mutation({
           status: "FINAL",
         });
       }
+    } else {
+      throw new Error(`Cannot force next round from status: ${game.status}`);
     }
   },
 });
