@@ -1,5 +1,5 @@
 import React from "react";
-//import { useQuery, useMutation } from "convex/react";
+import { useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { Id } from "../convex/_generated/dataModel";
 import { Map } from "../components/Map";
@@ -27,16 +27,6 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
     api.players.getBySession,
     { gameId, sessionId: getSessionId() }
   );
-  const locations = useQuery(api.locations.list, { gameId });
-
-  // Sort locations to ensure consistent order
-  //const sortedLocations = locations
-    //? [...locations].sort((a, b) => {
-        // Sort by player creation order, then by hint
-      //  return a.hint.localeCompare(b.hint);
-      //})
-    //: null;
-
   if (!game || !activeLocation || !players || !guesses || !isLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center">
