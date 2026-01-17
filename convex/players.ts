@@ -91,9 +91,17 @@ export const updateHeartbeat = mutation({
       .first();
 
     if (player) {
-      await ctx.db.patch(player._id, {
+      // Fix any invalid totalScore values
+      const patchData: any = {
         lastSeenAt: Date.now(),
-      });
+      };
+
+      if (!Number.isFinite(player.totalScore)) {
+        console.error("Found player with invalid totalScore:", player.name, player.totalScore);
+        patchData.totalScore = 0;
+      }
+
+      await ctx.db.patch(player._id, patchData);
     }
   },
 });

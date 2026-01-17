@@ -252,7 +252,6 @@ export const forceNextRound = mutation({
           // No more locations, finish game
           await ctx.db.patch(args.gameId, {
             status: "FINAL",
-            activeLocationId: undefined,
           });
           console.log("forceNextRound: Game finished");
         }
@@ -281,7 +280,6 @@ export const forceNextRound = mutation({
           // No more locations, finish game
           await ctx.db.patch(args.gameId, {
             status: "FINAL",
-            activeLocationId: undefined,
           });
           console.log("forceNextRound: Game finished");
         }
