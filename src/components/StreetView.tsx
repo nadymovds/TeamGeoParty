@@ -35,6 +35,10 @@ export const StreetView: React.FC<StreetViewProps> = ({ lat, lng }) => {
               position: data.location.latLng,
               pov: { heading: 0, pitch: 0 },
               zoom: 1,
+              addressControl: false,
+              fullscreenControl: false,
+              panControl: false,
+              zoomControl: false,
             }
           );
           setStatus("ready");
