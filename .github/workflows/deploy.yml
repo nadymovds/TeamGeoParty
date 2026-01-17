@@ -22,11 +22,11 @@ jobs:
           cache: 'npm'
       
       - run: npm ci
-      
-      - run: npm run build
+
+      - name: Deploy Convex functions
+        run: npx convex deploy --cmd "npm run build" --cmd-url-env-var-name VITE_CONVEX_URL -y
         env:
-          VITE_CONVEX_URL: ${{ secrets.VITE_CONVEX_URL }}
-          GITHUB_PAGES: true
+          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
       
       - uses: actions/upload-pages-artifact@v3
         with:
