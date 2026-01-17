@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { Id } from "../convex/_generated/dataModel";
 import { PlayerList } from "../components/PlayerList";
+import { HostMenu } from "../components/HostMenu";
 import { getSessionId, createGameUrl } from "../utils";
 
 interface LobbyScreenProps {
@@ -85,7 +86,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
   const gameUrl = createGameUrl(gameId);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 ${isHost ? 'mr-80' : ''}`}>
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
           <h1 className="text-3xl font-bold mb-2">TeamGeo</h1>
@@ -177,6 +178,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
           </div>
         )}
       </div>
+      <HostMenu gameId={gameId} />
     </div>
   );
 };

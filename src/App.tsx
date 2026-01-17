@@ -7,10 +7,11 @@ import { SetupScreen } from "./screens/SetupScreen";
 import { GuessScreen } from "./screens/GuessScreen";
 import { RoundResultScreen } from "./screens/RoundResultScreen";
 import { FinalScreen } from "./screens/FinalScreen";
-import { getGameIdFromUrl } from "./utils";
+import { getGameIdFromUrl, getSessionId } from "./utils";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { Id } from "../convex/_generated/dataModel";
+import { GoogleMapsProvider } from "./contexts/GoogleMapsContext";
 
 const GameRouter: React.FC = () => {
   const gameIdFromUrl = getGameIdFromUrl();
@@ -29,6 +30,22 @@ const GameContent: React.FC<{ gameId: Id<"games"> }> = ({ gameId }) => {
   const startRound = useMutation(api.games.startRound);
   const finishRound = useMutation(api.games.finishRound);
   const finishGame = useMutation(api.games.finishGame);
+  const updateHeartbeat = useMutation(api.players.updateHeartbeat);
+
+  // Send heartbeat every 5 seconds to track online status
+  useEffect(() => {
+    const sessionId = getSessionId();
+
+    // Send initial heartbeat
+    updateHeartbeat({ gameId, sessionId });
+
+    // Set up interval for periodic heartbeats
+    const interval = setInterval(() => {
+      updateHeartbeat({ gameId, sessionId });
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [gameId, updateHeartbeat]);
 
   // Auto-start first round when all players are ready and game is in SETUP
   useEffect(() => {
@@ -44,7 +61,7 @@ const GameContent: React.FC<{ gameId: Id<"games"> }> = ({ gameId }) => {
         a.hint.localeCompare(b.hint)
       );
 
-      // Wait a bit for UI to update, then start first round
+      // Small delay to ensure Convex state is settled
       const timer = setTimeout(async () => {
         const firstLocation = sortedLocations[0];
         if (firstLocation) {
@@ -54,7 +71,7 @@ const GameContent: React.FC<{ gameId: Id<"games"> }> = ({ gameId }) => {
             round: 1,
           });
         }
-      }, 1000);
+      }, 100);
       return () => clearTimeout(timer);
     }
   }, [game?.status, players, locations, gameId, startRound]);
@@ -78,7 +95,7 @@ const GameContent: React.FC<{ gameId: Id<"games"> }> = ({ gameId }) => {
       // All players have guessed, automatically finish the round
       const timer = setTimeout(async () => {
         await finishRound({ gameId });
-      }, 1000);
+      }, 100);
       return () => clearTimeout(timer);
     }
   }, [game?.status, players, guesses, game?.activeLocationId, gameId, finishRound]);
@@ -93,7 +110,7 @@ const GameContent: React.FC<{ gameId: Id<"games"> }> = ({ gameId }) => {
     ) {
       const timer = setTimeout(async () => {
         await finishGame({ gameId });
-      }, 2000);
+      }, 500);
       return () => clearTimeout(timer);
     }
   }, [game?.status, game?.currentRound, locations, gameId, finishGame]);
@@ -106,24 +123,33 @@ const GameContent: React.FC<{ gameId: Id<"games"> }> = ({ gameId }) => {
     );
   }
 
-  switch (game.status) {
-    case "LOBBY":
-      return <LobbyScreen gameId={gameId} />;
-    case "SETUP":
-      return <SetupScreen gameId={gameId} />;
-    case "PLAYING":
-      return <GuessScreen gameId={gameId} />;
-    case "RESULTS":
-      return <RoundResultScreen gameId={gameId} />;
-    case "FINAL":
-      return <FinalScreen gameId={gameId} />;
-    default:
-      return (
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-xl">Неизвестный статус игры</div>
-        </div>
-      );
-  }
+  // Wrap screens in GoogleMapsProvider with API key from game
+  const renderScreen = () => {
+    switch (game.status) {
+      case "LOBBY":
+        return <LobbyScreen gameId={gameId} />;
+      case "SETUP":
+        return <SetupScreen gameId={gameId} />;
+      case "PLAYING":
+        return <GuessScreen gameId={gameId} />;
+      case "RESULTS":
+        return <RoundResultScreen gameId={gameId} />;
+      case "FINAL":
+        return <FinalScreen gameId={gameId} />;
+      default:
+        return (
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="text-xl">Неизвестный статус игры</div>
+          </div>
+        );
+    }
+  };
+
+  return (
+    <GoogleMapsProvider apiKey={game.googleApiKey}>
+      {renderScreen()}
+    </GoogleMapsProvider>
+  );
 };
 
 function App() {

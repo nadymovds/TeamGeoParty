@@ -77,3 +77,23 @@ export const getBySession = query({
       .first();
   },
 });
+
+export const updateHeartbeat = mutation({
+  args: {
+    gameId: v.id("games"),
+    sessionId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const player = await ctx.db
+      .query("players")
+      .withIndex("by_game", (q) => q.eq("gameId", args.gameId))
+      .filter((q) => q.eq(q.field("sessionId"), args.sessionId))
+      .first();
+
+    if (player) {
+      await ctx.db.patch(player._id, {
+        lastSeenAt: Date.now(),
+      });
+    }
+  },
+});

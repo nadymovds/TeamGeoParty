@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useJsApiLoader } from "@react-google-maps/api";
+import { useGoogleMaps } from "../contexts/GoogleMapsContext";
 
 const containerStyle = {
   width: "100%",
@@ -7,19 +7,16 @@ const containerStyle = {
 };
 
 interface StreetViewProps {
-  apiKey: string;
   lat: number;
   lng: number;
 }
 
-export const StreetView: React.FC<StreetViewProps> = ({ apiKey, lat, lng }) => {
+export const StreetView: React.FC<StreetViewProps> = ({ lat, lng }) => {
   const streetViewRef = useRef<HTMLDivElement>(null);
   const panoramaRef = useRef<google.maps.StreetViewPanorama | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "no_coverage">("loading");
 
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: apiKey,
-  });
+  const { isLoaded, loadError } = useGoogleMaps();
 
   useEffect(() => {
     if (!isLoaded || !streetViewRef.current) return;
@@ -46,7 +43,23 @@ export const StreetView: React.FC<StreetViewProps> = ({ apiKey, lat, lng }) => {
         }
       }
     );
+
+    // Cleanup function to destroy panorama when component unmounts or coordinates change
+    return () => {
+      if (panoramaRef.current) {
+        panoramaRef.current.setVisible(false);
+        panoramaRef.current = null;
+      }
+    };
   }, [isLoaded, lat, lng]);
+
+  if (loadError) {
+    return (
+      <div style={containerStyle} className="bg-red-50 rounded flex items-center justify-center">
+        <p className="text-red-600">Ошибка загрузки Street View</p>
+      </div>
+    );
+  }
 
   if (!isLoaded) {
     return (

@@ -4,6 +4,7 @@ import { api } from "../convex/_generated/api";
 import { Id } from "../convex/_generated/dataModel";
 import { Map } from "../components/Map";
 import { StreetView } from "../components/StreetView";
+import { HostMenu } from "../components/HostMenu";
 import { getSessionId } from "../utils";
 
 interface GuessScreenProps {
@@ -24,7 +25,6 @@ export const GuessScreen: React.FC<GuessScreenProps> = ({ gameId }) => {
       : "skip"
   );
   const submitGuess = useMutation(api.guesses.submit);
-  const resetGame = useMutation(api.admin.resetGame);
 
   const [selectedLocation, setSelectedLocation] = useState<{
     lat: number;
@@ -55,17 +55,6 @@ export const GuessScreen: React.FC<GuessScreenProps> = ({ gameId }) => {
     }
   };
 
-  const handleResetGame = async () => {
-    if (!confirm("Вы уверены, что хотите сбросить игру? Все данные будут удалены и игра вернётся в лобби.")) {
-      return;
-    }
-    try {
-      await resetGame({ gameId });
-    } catch (err) {
-      alert(err instanceof Error ? err.message : "Ошибка сброса");
-    }
-  };
-
   if (!game || !activeLocation || !currentPlayer) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -75,9 +64,10 @@ export const GuessScreen: React.FC<GuessScreenProps> = ({ gameId }) => {
   }
 
   const hasSubmitted = myGuess !== undefined && myGuess !== null;
+  const isHost = currentPlayer?.isHost;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-100 p-4">
+    <div className={`min-h-screen bg-gradient-to-br from-orange-50 to-red-100 p-4 ${isHost ? 'mr-80' : ''}`}>
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
           <h1 className="text-3xl font-bold mb-2">Раунд {game.currentRound ?? 1}</h1>
@@ -89,40 +79,30 @@ export const GuessScreen: React.FC<GuessScreenProps> = ({ gameId }) => {
           </p>
         </div>
 
-        {game.googleApiKey && (
-          <div className="bg-white rounded-lg shadow-lg p-4 mb-4">
-            <h2 className="text-xl font-semibold mb-4">Панорама местности:</h2>
-            <StreetView
-              apiKey={game.googleApiKey}
-              lat={activeLocation.lat}
-              lng={activeLocation.lng}
-            />
-          </div>
-        )}
+        <div className="bg-white rounded-lg shadow-lg p-4 mb-4">
+          <h2 className="text-xl font-semibold mb-4">Панорама местности:</h2>
+          <StreetView
+            lat={activeLocation.lat}
+            lng={activeLocation.lng}
+          />
+        </div>
 
         <div className="bg-white rounded-lg shadow-lg p-4 mb-4">
           <h2 className="text-xl font-semibold mb-4">Ваше предположение:</h2>
-          {game.googleApiKey ? (
-            <Map
-              apiKey={game.googleApiKey}
-              onClick={hasSubmitted ? undefined : handleMapClick}
-              markers={
-                selectedLocation
-                  ? [
-                      {
-                        lat: selectedLocation.lat,
-                        lng: selectedLocation.lng,
-                        label: hasSubmitted ? "✓" : "?",
-                      },
-                    ]
-                  : []
-              }
-            />
-          ) : (
-            <div className="h-96 flex items-center justify-center bg-gray-100 rounded">
-              <p className="text-gray-500">Загрузка карты...</p>
-            </div>
-          )}
+          <Map
+            onClick={hasSubmitted ? undefined : handleMapClick}
+            markers={
+              selectedLocation
+                ? [
+                    {
+                      lat: selectedLocation.lat,
+                      lng: selectedLocation.lng,
+                      label: hasSubmitted ? "✓" : "?",
+                    },
+                  ]
+                : []
+            }
+          />
         </div>
 
         {selectedLocation && !hasSubmitted && (
@@ -147,18 +127,8 @@ export const GuessScreen: React.FC<GuessScreenProps> = ({ gameId }) => {
             </p>
           </div>
         )}
-
-        {currentPlayer?.isHost && (
-          <div className="mt-4">
-            <button
-              onClick={handleResetGame}
-              className="w-full px-4 py-2 bg-red-100 text-red-700 rounded-lg font-medium hover:bg-red-200 border border-red-300 transition-colors"
-            >
-              Сбросить игру
-            </button>
-          </div>
-        )}
       </div>
+      <HostMenu gameId={gameId} />
     </div>
   );
 };

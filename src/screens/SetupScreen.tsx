@@ -5,6 +5,7 @@ import { Id } from "../convex/_generated/dataModel";
 import { Map } from "../components/Map";
 import { StreetView } from "../components/StreetView";
 import { PlayerList } from "../components/PlayerList";
+import { HostMenu } from "../components/HostMenu";
 import { getSessionId } from "../utils";
 
 interface SetupScreenProps {
@@ -91,9 +92,10 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
   const locationsCount = myLocations?.length ?? 0;
   const participatingPlayers = players.filter((p) => p.isParticipating);
   const allReady = participatingPlayers.every((p) => p.isReady);
+  const isHost = currentPlayer?.isHost;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 p-4">
+    <div className={`min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 p-4 ${isHost ? 'mr-80' : ''}`}>
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
           <h1 className="text-3xl font-bold mb-2">Настройка локаций</h1>
@@ -109,27 +111,19 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
                 Добавить локацию ({locationsCount}/{locationsNeeded})
               </h2>
 
-              {game.googleApiKey ? (
-                <Map
-                  apiKey={game.googleApiKey}
-                  onClick={handleMapClick}
-                  markers={
-                    selectedLocation
-                      ? [{ lat: selectedLocation.lat, lng: selectedLocation.lng, label: "✓" }]
-                      : []
-                  }
-                />
-              ) : (
-                <div className="h-96 flex items-center justify-center bg-gray-100 rounded">
-                  <p className="text-gray-500">Загрузка карты...</p>
-                </div>
-              )}
+              <Map
+                onClick={handleMapClick}
+                markers={
+                  selectedLocation
+                    ? [{ lat: selectedLocation.lat, lng: selectedLocation.lng, label: "✓" }]
+                    : []
+                }
+              />
 
-              {selectedLocation && game.googleApiKey && (
+              {selectedLocation && (
                 <div className="mt-4">
                   <h3 className="text-lg font-semibold mb-2">Предпросмотр панорамы:</h3>
                   <StreetView
-                    apiKey={game.googleApiKey}
                     lat={selectedLocation.lat}
                     lng={selectedLocation.lng}
                   />
@@ -222,6 +216,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
           </div>
         </div>
       </div>
+      <HostMenu gameId={gameId} />
     </div>
   );
 };

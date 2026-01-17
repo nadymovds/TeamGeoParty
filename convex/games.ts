@@ -124,3 +124,131 @@ export const finishGame = mutation({
     });
   },
 });
+
+export const forceNextRound = mutation({
+  args: { gameId: v.id("games") },
+  handler: async (ctx, args) => {
+    const game = await ctx.db.get(args.gameId);
+    if (!game) {
+      throw new Error("Game not found");
+    }
+
+    // Get all locations sorted consistently
+    const locations = await ctx.db
+      .query("locations")
+      .withIndex("by_game", (q) => q.eq("gameId", args.gameId))
+      .collect();
+
+    const sortedLocations = [...locations].sort((a, b) =>
+      a.hint.localeCompare(b.hint)
+    );
+
+    // Get all participating players
+    const players = await ctx.db
+      .query("players")
+      .withIndex("by_game", (q) => q.eq("gameId", args.gameId))
+      .filter((q) => q.eq(q.field("isParticipating"), true))
+      .collect();
+
+    if (game.status === "PLAYING" && game.activeLocationId) {
+      // Create dummy guesses for players who haven't guessed yet
+      const guesses = await ctx.db
+        .query("guesses")
+        .withIndex("by_location", (q) => q.eq("locationId", game.activeLocationId!))
+        .collect();
+
+      const playersWhoGuessed = new Set(guesses.map((g) => g.playerId));
+
+      for (const player of players) {
+        if (!playersWhoGuessed.has(player._id)) {
+          // Create a dummy guess with maximum distance (0 points)
+          await ctx.db.insert("guesses", {
+            locationId: game.activeLocationId,
+            playerId: player._id,
+            lat: 0,
+            lng: 0,
+            distance: 99999,
+            round: game.currentRound,
+          });
+        }
+      }
+
+      // Finish the current round (calculates scores)
+      await ctx.db.patch(args.gameId, {
+        status: "RESULTS",
+      });
+
+      // Calculate scores for all guesses (including dummy ones)
+      const allGuesses = await ctx.db
+        .query("guesses")
+        .withIndex("by_location", (q) => q.eq("locationId", game.activeLocationId!))
+        .collect();
+
+      const maxDistance = 20000;
+      const maxPoints = 1000;
+
+      for (const guess of allGuesses) {
+        const points = Math.max(
+          0,
+          Math.floor(maxPoints * (1 - guess.distance / maxDistance))
+        );
+
+        const player = await ctx.db.get(guess.playerId);
+        if (player) {
+          await ctx.db.patch(guess.playerId, {
+            totalScore: player.totalScore + points,
+          });
+        }
+      }
+
+      // Find next location
+      const currentIndex = sortedLocations.findIndex(
+        (loc) => loc._id === game.activeLocationId
+      );
+
+      if (currentIndex !== -1 && currentIndex < sortedLocations.length - 1) {
+        const nextLocation = sortedLocations[currentIndex + 1];
+        // Start next round immediately
+        await ctx.db.patch(args.gameId, {
+          status: "PLAYING",
+          activeLocationId: nextLocation._id,
+          currentRound: (game.currentRound ?? 1) + 1,
+        });
+      } else {
+        // No more locations, finish game
+        await ctx.db.patch(args.gameId, {
+          status: "FINAL",
+        });
+      }
+    } else if (game.status === "RESULTS") {
+      // Currently in RESULTS, move to next round
+      const currentIndex = sortedLocations.findIndex(
+        (loc) => loc._id === game.activeLocationId
+      );
+
+      if (currentIndex !== -1 && currentIndex < sortedLocations.length - 1) {
+        const nextLocation = sortedLocations[currentIndex + 1];
+        await ctx.db.patch(args.gameId, {
+          status: "PLAYING",
+          activeLocationId: nextLocation._id,
+          currentRound: (game.currentRound ?? 1) + 1,
+        });
+      } else {
+        // No more locations, finish game
+        await ctx.db.patch(args.gameId, {
+          status: "FINAL",
+        });
+      }
+    }
+  },
+});
+
+export const forceFinishGame = mutation({
+  args: { gameId: v.id("games") },
+  handler: async (ctx, args) => {
+    // Force finish game from any state
+    await ctx.db.patch(args.gameId, {
+      status: "FINAL",
+    });
+  },
+});

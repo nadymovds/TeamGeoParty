@@ -3,6 +3,8 @@ import { useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { Id } from "../convex/_generated/dataModel";
 import { ScoreTable } from "../components/ScoreTable";
+import { HostMenu } from "../components/HostMenu";
+import { getSessionId } from "../utils";
 
 interface FinalScreenProps {
   gameId: Id<"games">;
@@ -11,6 +13,10 @@ interface FinalScreenProps {
 export const FinalScreen: React.FC<FinalScreenProps> = ({ gameId }) => {
   const game = useQuery(api.games.get, { gameId });
   const players = useQuery(api.players.list, { gameId });
+  const currentPlayer = useQuery(api.players.getBySession, {
+    gameId,
+    sessionId: getSessionId(),
+  });
 
   if (!game || !players) {
     return (
@@ -20,8 +26,10 @@ export const FinalScreen: React.FC<FinalScreenProps> = ({ gameId }) => {
     );
   }
 
+  const isHost = currentPlayer?.isHost;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-orange-100 p-4">
+    <div className={`min-h-screen bg-gradient-to-br from-yellow-50 to-orange-100 p-4 ${isHost ? 'mr-80' : ''}`}>
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-8 mb-6 text-center">
           <h1 className="text-4xl font-bold mb-4">🎉 Игра завершена! 🎉</h1>
@@ -43,6 +51,7 @@ export const FinalScreen: React.FC<FinalScreenProps> = ({ gameId }) => {
           </button>
         </div>
       </div>
+      <HostMenu gameId={gameId} />
     </div>
   );
 };
