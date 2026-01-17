@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { GoogleMap, Marker, InfoWindow } from "@react-google-maps/api";
 import { useGoogleMaps } from "../contexts/GoogleMapsContext";
 
@@ -33,6 +33,7 @@ export const Map: React.FC<MapProps> = ({
   zoom = 2,
 }) => {
   const { isLoaded, loadError } = useGoogleMaps();
+  const [hoveredMarker, setHoveredMarker] = useState<number | null>(null);
 
   const onMapClick = useCallback(
     (e: google.maps.MapMouseEvent | google.maps.IconMouseEvent) => {
@@ -85,16 +86,18 @@ export const Map: React.FC<MapProps> = ({
           <Marker
             position={{ lat: marker.lat, lng: marker.lng }}
             label={marker.label}
+            onMouseOver={() => setHoveredMarker(index)}
+            onMouseOut={() => setHoveredMarker(null)}
           />
-          {marker.title && (
+          {marker.title && hoveredMarker === index && (
             <InfoWindow
               position={{ lat: marker.lat, lng: marker.lng }}
               options={{
-                pixelOffset: new window.google.maps.Size(0, 30),
+                pixelOffset: new window.google.maps.Size(0, -40),
                 disableAutoPan: true,
               }}
             >
-              <div className="px-2 py-1 text-xs font-medium text-gray-800 whitespace-nowrap">
+              <div className="px-2 py-1 text-sm font-medium text-gray-800 whitespace-nowrap">
                 {marker.title}
               </div>
             </InfoWindow>
