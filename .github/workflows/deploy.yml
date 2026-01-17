@@ -27,6 +27,7 @@ jobs:
         run: npx convex deploy --cmd "npm run build" --cmd-url-env-var-name VITE_CONVEX_URL -y
         env:
           CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
+          GITHUB_PAGES: true
       
       - uses: actions/upload-pages-artifact@v3
         with:
