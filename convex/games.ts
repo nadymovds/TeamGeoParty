@@ -147,12 +147,14 @@ export const forceNextRound = mutation({
       a.hint.localeCompare(b.hint)
     );
 
-    // Get all participating players
-    const players = await ctx.db
+    // Get all players and filter participating ones
+    const allPlayers = await ctx.db
       .query("players")
       .withIndex("by_game", (q) => q.eq("gameId", args.gameId))
-      .filter((q) => q.eq(q.field("isParticipating"), true))
       .collect();
+
+    // Filter participating players (handle optional field safely)
+    const players = allPlayers.filter(p => p.isParticipating !== false);
 
     if (game.status === "PLAYING" && game.activeLocationId) {
       // Create dummy guesses for players who haven't guessed yet

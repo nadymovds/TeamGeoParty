@@ -111,14 +111,18 @@ const GameContentInner: React.FC<GameContentInnerProps> = ({ game, gameId }) => 
       game.status === "PLAYING" &&
       players &&
       guesses &&
-      game.activeLocationId &&
-      guesses.length >= players.length
+      game.activeLocationId
     ) {
-      // All players have guessed, automatically finish the round
-      const timer = setTimeout(async () => {
-        await finishRound({ gameId });
-      }, 100);
-      return () => clearTimeout(timer);
+      // Only count participating players
+      const participatingPlayers = players.filter(p => p.isParticipating !== false);
+
+      // All participating players have guessed, automatically finish the round
+      if (guesses.length >= participatingPlayers.length && participatingPlayers.length > 0) {
+        const timer = setTimeout(async () => {
+          await finishRound({ gameId });
+        }, 100);
+        return () => clearTimeout(timer);
+      }
     }
   }, [game.status, players, guesses, game.activeLocationId, gameId, finishRound]);
 
