@@ -22,46 +22,40 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
 
   const forceNextRound = useMutation(api.games.forceNextRound);
   const forceFinishGame = useMutation(api.games.forceFinishGame);
-  const resetGame = useMutation(api.admin.resetGame);
 
   if (!currentPlayer?.isHost || !game || !players) {
     return null;
   }
 
   const handleForceNextRound = async () => {
-    if (
-      confirm(
-        "Принудительно перейти к следующему раунду? Игроки без ответов получат 0 очков."
-      )
-    ) {
-      try {
-        await forceNextRound({ gameId });
-      } catch (err) {
-        alert(err instanceof Error ? err.message : "Ошибка перехода");
+    // Check if all participating players have answered
+    const participatingPlayers = players.filter(p => p.isParticipating);
+    const playersWithGuesses = new Set(guesses?.map(g => g.playerId) || []);
+    const playersWithoutGuesses = participatingPlayers.filter(p => !playersWithGuesses.has(p._id));
+
+    // Only show confirmation if there are players who haven't answered
+    if (playersWithoutGuesses.length > 0) {
+      const playerNames = playersWithoutGuesses.map(p => p.name).join(", ");
+      if (!confirm(
+        `Перейти к следующему раунду?\n\nИгроки без ответов (${playersWithoutGuesses.length}): ${playerNames}\nОни получат 0 очков.`
+      )) {
+        return;
       }
+    }
+
+    try {
+      await forceNextRound({ gameId });
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Ошибка перехода");
     }
   };
 
   const handleForceFinish = async () => {
-    if (confirm("Завершить игру досрочно?")) {
+    if (confirm("Завершить игру?\n\nИгра будет завершена и откроется таблица финальных результатов.")) {
       try {
         await forceFinishGame({ gameId });
       } catch (err) {
         alert(err instanceof Error ? err.message : "Ошибка завершения");
-      }
-    }
-  };
-
-  const handleReset = async () => {
-    if (
-      confirm(
-        "Сбросить игру и вернуться в лобби? Все данные будут удалены!"
-      )
-    ) {
-      try {
-        await resetGame({ gameId });
-      } catch (err) {
-        alert(err instanceof Error ? err.message : "Ошибка сброса");
       }
     }
   };
@@ -100,16 +94,9 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
 
           <button
             onClick={handleForceFinish}
-            className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors"
+            className="w-full px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors"
           >
             Завершить игру
-          </button>
-
-          <button
-            onClick={handleReset}
-            className="w-full px-4 py-2 bg-red-100 text-red-700 rounded-lg font-medium hover:bg-red-200 border border-red-300 transition-colors"
-          >
-            Сбросить игру
           </button>
         </div>
 
