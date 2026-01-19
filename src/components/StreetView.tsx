@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useGoogleMaps } from "../contexts/GoogleMapsContext";
+import { getPanoramaWithCache } from "../utils/panoramaCache";
 
 const containerStyle = {
   width: "100%",
@@ -22,34 +23,41 @@ export const StreetView: React.FC<StreetViewProps> = ({ lat, lng }) => {
     if (!isLoaded || !streetViewRef.current) return;
 
     setStatus("loading");
+    let cancelled = false;
 
-    const streetViewService = new window.google.maps.StreetViewService();
+    const loadPanorama = async () => {
+      const streetViewService = new window.google.maps.StreetViewService();
+      const result = await getPanoramaWithCache(streetViewService, lat, lng, 50);
 
-    streetViewService.getPanorama(
-      { location: { lat, lng }, radius: 50 },
-      (data, serviceStatus) => {
-        if (serviceStatus === window.google.maps.StreetViewStatus.OK && data?.location?.latLng) {
-          panoramaRef.current = new window.google.maps.StreetViewPanorama(
-            streetViewRef.current!,
-            {
-              position: data.location.latLng,
-              pov: { heading: 0, pitch: 0 },
-              zoom: 1,
-              addressControl: false,
-              fullscreenControl: false,
-              panControl: false,
-              zoomControl: false,
-            }
-          );
-          setStatus("ready");
-        } else {
-          setStatus("no_coverage");
-        }
+      if (cancelled) return;
+
+      if (
+        result.status === window.google.maps.StreetViewStatus.OK &&
+        result.location?.latLng
+      ) {
+        panoramaRef.current = new window.google.maps.StreetViewPanorama(
+          streetViewRef.current!,
+          {
+            position: result.location.latLng,
+            pov: { heading: 0, pitch: 0 },
+            zoom: 1,
+            addressControl: false,
+            fullscreenControl: false,
+            panControl: false,
+            zoomControl: false,
+          }
+        );
+        setStatus("ready");
+      } else {
+        setStatus("no_coverage");
       }
-    );
+    };
+
+    loadPanorama();
 
     // Cleanup function to destroy panorama when component unmounts or coordinates change
     return () => {
+      cancelled = true;
       if (panoramaRef.current) {
         panoramaRef.current.setVisible(false);
         panoramaRef.current = null;

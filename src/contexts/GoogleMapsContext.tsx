@@ -4,6 +4,7 @@ import { useJsApiLoader, Libraries } from "@react-google-maps/api";
 interface GoogleMapsContextType {
   isLoaded: boolean;
   loadError: Error | undefined;
+  apiKey: string;
 }
 
 const GoogleMapsContext = createContext<GoogleMapsContextType | undefined>(
@@ -23,7 +24,7 @@ interface GoogleMapsProviderProps {
   children: ReactNode;
 }
 
-const libraries: Libraries = ["geometry", "places"];
+const libraries: Libraries = ["geometry"];
 
 export const GoogleMapsProvider: React.FC<GoogleMapsProviderProps> = ({
   apiKey,
@@ -35,7 +36,7 @@ export const GoogleMapsProvider: React.FC<GoogleMapsProviderProps> = ({
   });
 
   return (
-    <GoogleMapsContext.Provider value={{ isLoaded, loadError }}>
+    <GoogleMapsContext.Provider value={{ isLoaded, loadError, apiKey }}>
       {children}
     </GoogleMapsContext.Provider>
   );

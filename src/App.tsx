@@ -24,9 +24,11 @@ const GameRouter: React.FC = () => {
 };
 
 const GameContent: React.FC<{ gameId: Id<"games"> }> = ({ gameId }) => {
+  const sessionId = getSessionId();
   const game = useQuery(api.games.get, { gameId });
+  const apiKey = useQuery(api.games.getApiKey, { gameId, sessionId });
 
-  if (!game) {
+  if (!game || apiKey === undefined) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-xl">Загрузка игры...</div>
@@ -34,15 +36,28 @@ const GameContent: React.FC<{ gameId: Id<"games"> }> = ({ gameId }) => {
     );
   }
 
+  if (apiKey === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl text-red-600">
+          Ошибка: нет доступа к игре. Присоединитесь через ссылку от хоста.
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <GoogleMapsProvider apiKey={game.googleApiKey}>
+    <GoogleMapsProvider apiKey={apiKey}>
       <GameContentInner game={game} gameId={gameId} />
     </GoogleMapsProvider>
   );
 };
 
+// Game type without googleApiKey (it's fetched separately for security)
+type GameWithoutApiKey = Omit<Doc<"games">, "googleApiKey">;
+
 interface GameContentInnerProps {
-  game: Doc<"games">;
+  game: GameWithoutApiKey;
   gameId: Id<"games">;
 }
 

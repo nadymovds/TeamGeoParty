@@ -51,7 +51,39 @@ export const create = mutation({
 export const get = query({
   args: { gameId: v.id("games") },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.gameId);
+    const game = await ctx.db.get(args.gameId);
+    if (!game) return null;
+
+    // Don't expose googleApiKey in the main query
+    const { googleApiKey: _, ...gameWithoutKey } = game;
+    return gameWithoutKey;
+  },
+});
+
+// Separate query for API key - only returns to game participants
+export const getApiKey = query({
+  args: {
+    gameId: v.id("games"),
+    sessionId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const game = await ctx.db.get(args.gameId);
+    if (!game) return null;
+
+    // Check if the requester is a participant in this game
+    const player = await ctx.db
+      .query("players")
+      .withIndex("by_session", (q) =>
+        q.eq("gameId", args.gameId).eq("sessionId", args.sessionId)
+      )
+      .first();
+
+    // Only return API key to game participants
+    if (!player) {
+      return null;
+    }
+
+    return game.googleApiKey;
   },
 });
 

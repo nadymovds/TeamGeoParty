@@ -28,7 +28,9 @@ export default defineSchema({
     totalScore: v.number(),
     sessionId: v.string(),
     lastSeenAt: v.optional(v.number()), // Timestamp of last heartbeat
-  }).index("by_game", ["gameId"]),
+  })
+    .index("by_game", ["gameId"])
+    .index("by_session", ["gameId", "sessionId"]),
 
   locations: defineTable({
     gameId: v.id("games"),

@@ -2,7 +2,7 @@ import React from "react";
 import { useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { Id } from "../convex/_generated/dataModel";
-import { Map } from "../components/Map";
+import { StaticMap } from "../components/StaticMap";
 import { StreetView } from "../components/StreetView";
 import { ScoreTable } from "../components/ScoreTable";
 import { HostMenu } from "../components/HostMenu";
@@ -86,7 +86,7 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
           <div className="bg-white rounded-lg shadow-lg p-4">
-            <Map
+            <StaticMap
               center={{ lat: activeLocation.lat, lng: activeLocation.lng }}
               markers={markers}
               fitBounds={true}

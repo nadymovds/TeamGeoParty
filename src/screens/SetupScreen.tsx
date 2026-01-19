@@ -8,6 +8,7 @@ import { PlayerList } from "../components/PlayerList";
 import { HostMenu } from "../components/HostMenu";
 import { getSessionId } from "../utils";
 import { useGoogleMaps } from "../contexts/GoogleMapsContext";
+import { getPanoramaWithCache } from "../utils/panoramaCache";
 
 interface SetupScreenProps {
   gameId: Id<"games">;
@@ -43,18 +44,17 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
   const [hasPanorama, setHasPanorama] = useState<boolean | null>(null);
   const [checkingPanorama, setCheckingPanorama] = useState(false);
 
-  const handleMapClick = (lat: number, lng: number) => {
+  const handleMapClick = async (lat: number, lng: number) => {
     setSelectedLocation({ lat, lng });
     setHasPanorama(null);
     setCheckingPanorama(true);
 
     const streetViewService = new google.maps.StreetViewService();
-    streetViewService.getPanorama(
-      { location: { lat, lng }, radius: 50 },
-      (data, status) => {
-        setCheckingPanorama(false);
-        setHasPanorama(status === google.maps.StreetViewStatus.OK && !!data?.location?.latLng);
-      }
+    const result = await getPanoramaWithCache(streetViewService, lat, lng, 50);
+
+    setCheckingPanorama(false);
+    setHasPanorama(
+      result.status === google.maps.StreetViewStatus.OK && !!result.location?.latLng
     );
   };
 

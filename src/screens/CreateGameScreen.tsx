@@ -87,6 +87,23 @@ export const CreateGameScreen: React.FC = () => {
                 Google даёт достаточно ежемесячных бесплатных кредитов.
               </p>
             </div>
+            <div className="mt-2 p-3 bg-amber-50 rounded-lg border border-amber-200">
+              <p className="text-xs font-medium text-amber-800 mb-2">Защита ключа (рекомендуется):</p>
+              <ol className="text-xs text-amber-700 space-y-1 list-decimal list-inside">
+                <li>В Google Cloud Console перейдите в "Credentials"</li>
+                <li>Нажмите на ваш API ключ для редактирования</li>
+                <li>В разделе "Application restrictions" выберите <span className="font-medium">"HTTP referrers"</span></li>
+                <li>Добавьте домены: <code className="bg-amber-100 px-1 rounded">*.github.io/*</code> (для GitHub Pages) или ваш домен</li>
+                <li>В разделе "API restrictions" выберите <span className="font-medium">"Restrict key"</span></li>
+                <li>Выберите только: <span className="font-medium">Maps JavaScript API</span>, <span className="font-medium">Geocoding API</span></li>
+              </ol>
+              <p className="text-xs text-amber-600 mt-2">
+                Это защитит ключ от использования на других сайтах.
+              </p>
+              <p className="text-xs text-amber-700 mt-2 font-medium">
+                После игры рекомендуем пересоздать ключ в Google Console для безопасности.
+              </p>
+            </div>
           </div>
 
           <div>

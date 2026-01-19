@@ -4,7 +4,7 @@ import { api } from "../convex/_generated/api";
 import { Id } from "../convex/_generated/dataModel";
 import { ScoreTable } from "../components/ScoreTable";
 import { HostMenu } from "../components/HostMenu";
-import { Map } from "../components/Map";
+import { StaticMap } from "../components/StaticMap";
 import { getSessionId } from "../utils";
 import { useGoogleMaps } from "../contexts/GoogleMapsContext";
 
@@ -83,12 +83,32 @@ export const FinalScreen: React.FC<FinalScreenProps> = ({ gameId }) => {
           <p className="text-sm text-gray-500 mb-3">
             Зеленые маркеры — правильные места, красные — предположения игроков
           </p>
-          <Map
+          <StaticMap
             center={mapCenter}
             markers={markers}
             fitBounds={true}
           />
         </div>
+
+        {isHost && (
+          <div className="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <p className="text-sm text-amber-800 font-medium mb-2">
+              Рекомендация по безопасности:
+            </p>
+            <p className="text-sm text-amber-700">
+              Пересоздайте API ключ в{" "}
+              <a
+                href="https://console.cloud.google.com/apis/credentials"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-amber-600 hover:underline font-medium"
+              >
+                Google Cloud Console
+              </a>
+              , чтобы исключить его дальнейшее использование другими игроками.
+            </p>
+          </div>
+        )}
 
         <div className="mt-6 bg-white rounded-lg shadow-lg p-6 text-center">
           <button
