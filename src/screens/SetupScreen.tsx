@@ -36,9 +36,33 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
   } | null>(null);
   const [hint, setHint] = useState("");
   const [showStreetViewCoverage, setShowStreetViewCoverage] = useState(false);
+  const [searchAddress, setSearchAddress] = useState("");
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | undefined>(undefined);
+  const [mapZoom, setMapZoom] = useState<number | undefined>(undefined);
+  const [isSearching, setIsSearching] = useState(false);
 
   const handleMapClick = (lat: number, lng: number) => {
     setSelectedLocation({ lat, lng });
+  };
+
+  const handleSearchAddress = () => {
+    if (!searchAddress.trim() || !isLoaded) return;
+
+    setIsSearching(true);
+    const geocoder = new google.maps.Geocoder();
+
+    geocoder.geocode({ address: searchAddress.trim() }, (results, status) => {
+      setIsSearching(false);
+      if (status === "OK" && results && results[0]) {
+        const location = results[0].geometry.location;
+        setMapCenter({ lat: location.lat(), lng: location.lng() });
+        setMapZoom(15);
+        setShowStreetViewCoverage(true);
+        setSearchAddress("");
+      } else {
+        alert("Адрес не найден");
+      }
+    });
   };
 
   const handleAddLocation = async () => {
@@ -116,6 +140,24 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
                 Добавить локацию ({locationsCount}/{locationsNeeded})
               </h2>
 
+              <div className="flex gap-2 mb-3">
+                <input
+                  type="text"
+                  value={searchAddress}
+                  onChange={(e) => setSearchAddress(e.target.value)}
+                  placeholder="Поиск по адресу..."
+                  className="flex-1 px-3 py-2 border rounded-lg text-sm"
+                  onKeyDown={(e) => e.key === "Enter" && handleSearchAddress()}
+                />
+                <button
+                  onClick={handleSearchAddress}
+                  disabled={!searchAddress.trim() || isSearching}
+                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:bg-gray-400 text-sm"
+                >
+                  {isSearching ? "..." : "Найти"}
+                </button>
+              </div>
+
               <div className="flex items-center justify-end mb-2">
                 <label className="flex items-center cursor-pointer">
                   <span className="text-sm text-gray-600 mr-2">Покрытие Street View</span>
@@ -141,6 +183,8 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
                     : []
                 }
                 showStreetViewCoverage={showStreetViewCoverage}
+                center={mapCenter}
+                zoom={mapZoom}
               />
 
               {selectedLocation && (
