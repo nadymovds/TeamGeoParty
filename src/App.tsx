@@ -28,7 +28,21 @@ const GameContent: React.FC<{ gameId: Id<"games"> }> = ({ gameId }) => {
   const game = useQuery(api.games.get, { gameId });
   const apiKey = useQuery(api.games.getApiKey, { gameId, sessionId });
 
-  if (!game || apiKey === undefined) {
+  if (!game) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl">Загрузка игры...</div>
+      </div>
+    );
+  }
+
+  // LobbyScreen doesn't need Google Maps - allow anyone with link to join
+  if (game.status === "LOBBY") {
+    return <LobbyScreen gameId={gameId} />;
+  }
+
+  // For other screens, require API key (participant access)
+  if (apiKey === undefined) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-xl">Загрузка игры...</div>
