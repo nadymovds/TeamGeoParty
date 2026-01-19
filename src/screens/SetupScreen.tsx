@@ -35,6 +35,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
     lng: number;
   } | null>(null);
   const [hint, setHint] = useState("");
+  const [showStreetViewCoverage, setShowStreetViewCoverage] = useState(true);
 
   const handleMapClick = (lat: number, lng: number) => {
     setSelectedLocation({ lat, lng });
@@ -115,6 +116,23 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
                 Добавить локацию ({locationsCount}/{locationsNeeded})
               </h2>
 
+              <div className="flex items-center justify-end mb-2">
+                <label className="flex items-center cursor-pointer">
+                  <span className="text-sm text-gray-600 mr-2">Покрытие Street View</span>
+                  <div className="relative">
+                    <input
+                      type="checkbox"
+                      checked={showStreetViewCoverage}
+                      onChange={(e) => setShowStreetViewCoverage(e.target.checked)}
+                      className="sr-only"
+                    />
+                    <div className={`w-10 h-6 rounded-full transition-colors ${showStreetViewCoverage ? 'bg-blue-500' : 'bg-gray-300'}`}>
+                      <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${showStreetViewCoverage ? 'translate-x-4' : ''}`} />
+                    </div>
+                  </div>
+                </label>
+              </div>
+
               <Map
                 onClick={handleMapClick}
                 markers={
@@ -122,6 +140,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
                     ? [{ lat: selectedLocation.lat, lng: selectedLocation.lng, label: "✓" }]
                     : []
                 }
+                showStreetViewCoverage={showStreetViewCoverage}
               />
 
               {selectedLocation && (

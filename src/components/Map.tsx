@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState, useEffect, useRef } from "react";
 import { GoogleMap, Marker, InfoWindow } from "@react-google-maps/api";
 import { useGoogleMaps } from "../contexts/GoogleMapsContext";
 
@@ -24,6 +24,7 @@ interface MapProps {
   markers?: MapMarker[];
   onClick?: (lat: number, lng: number) => void;
   zoom?: number;
+  showStreetViewCoverage?: boolean;
 }
 
 export const Map: React.FC<MapProps> = ({
@@ -31,9 +32,31 @@ export const Map: React.FC<MapProps> = ({
   markers = [],
   onClick,
   zoom = 2,
+  showStreetViewCoverage = false,
 }) => {
   const { isLoaded, loadError } = useGoogleMaps();
   const [hoveredMarker, setHoveredMarker] = useState<number | null>(null);
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const coverageLayerRef = useRef<google.maps.StreetViewCoverageLayer | null>(null);
+
+  const onMapLoad = useCallback((map: google.maps.Map) => {
+    mapRef.current = map;
+  }, []);
+
+  useEffect(() => {
+    if (!mapRef.current || !isLoaded) return;
+
+    if (showStreetViewCoverage) {
+      if (!coverageLayerRef.current) {
+        coverageLayerRef.current = new google.maps.StreetViewCoverageLayer();
+      }
+      coverageLayerRef.current.setMap(mapRef.current);
+    } else {
+      if (coverageLayerRef.current) {
+        coverageLayerRef.current.setMap(null);
+      }
+    }
+  }, [showStreetViewCoverage, isLoaded]);
 
   const onMapClick = useCallback(
     (e: google.maps.MapMouseEvent | google.maps.IconMouseEvent) => {
@@ -80,6 +103,7 @@ export const Map: React.FC<MapProps> = ({
       zoom={zoom}
       onClick={onMapClick}
       options={mapOptions}
+      onLoad={onMapLoad}
     >
       {markers.map((marker, index) => (
         <React.Fragment key={index}>
