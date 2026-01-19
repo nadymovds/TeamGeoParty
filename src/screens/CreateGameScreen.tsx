@@ -36,7 +36,7 @@ export const CreateGameScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
         <h1 className="text-3xl font-bold mb-2 text-center">TeamGeo</h1>
         <p className="text-gray-600 text-center mb-6">
@@ -54,7 +54,7 @@ export const CreateGameScreen: React.FC = () => {
               onChange={(e) => setHostName(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && handleCreateGame()}
               placeholder="Иван"
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
@@ -67,23 +67,23 @@ export const CreateGameScreen: React.FC = () => {
               value={googleApiKey}
               onChange={(e) => setGoogleApiKey(e.target.value)}
               placeholder="AIza..."
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
-            <div className="mt-2 p-3 bg-indigo-50 rounded-lg">
-              <p className="text-xs font-medium text-indigo-800 mb-2">Как получить ключ:</p>
-              <ol className="text-xs text-indigo-700 space-y-1 list-decimal list-inside">
+            <div className="mt-2 p-3 bg-blue-50 rounded-lg">
+              <p className="text-xs font-medium text-blue-800 mb-2">Как получить ключ:</p>
+              <ol className="text-xs text-blue-700 space-y-1 list-decimal list-inside">
                 <li>Откройте <a
                   href="https://console.cloud.google.com/google/maps-apis"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-indigo-600 hover:underline font-medium"
+                  className="text-blue-600 hover:underline font-medium"
                 >Google Cloud Console</a></li>
                 <li>Создайте проект (или выберите существующий)</li>
                 <li>Включите APIs: <span className="font-medium">Maps JavaScript API</span> и <span className="font-medium">Street View Static API</span></li>
                 <li>Перейдите в "Credentials" → "Create Credentials" → "API Key"</li>
                 <li>Скопируйте ключ (начинается с AIza...)</li>
               </ol>
-              <p className="text-xs text-indigo-600 mt-2">
+              <p className="text-xs text-blue-600 mt-2">
                 Google даёт достаточно ежемесячных бесплатных кредитов.
               </p>
             </div>
@@ -118,7 +118,7 @@ export const CreateGameScreen: React.FC = () => {
               onChange={(e) =>
                 setLocationsPerPlayer(parseInt(e.target.value) || 1)
               }
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
@@ -130,7 +130,7 @@ export const CreateGameScreen: React.FC = () => {
 
           <button
             onClick={handleCreateGame}
-            className="w-full px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
+            className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
           >
             Создать игру
           </button>

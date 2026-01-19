@@ -67,10 +67,10 @@ export const FinalScreen: React.FC<FinalScreenProps> = ({ gameId }) => {
     : { lat: 0, lng: 0 };
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-yellow-50 to-orange-100 p-4 ${isHost ? 'mr-80' : ''}`}>
+    <div className={`min-h-screen bg-gray-50 p-4 ${isHost ? 'mr-80' : ''}`}>
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-8 mb-6 text-center">
-          <h1 className="text-4xl font-bold mb-4">🎉 Игра завершена! 🎉</h1>
+          <h1 className="text-4xl font-bold mb-4">Игра завершена</h1>
           <p className="text-xl text-gray-600 mb-6">
             Спасибо за игру! Вот финальные результаты:
           </p>
@@ -115,7 +115,7 @@ export const FinalScreen: React.FC<FinalScreenProps> = ({ gameId }) => {
             onClick={() => {
               window.location.href = window.location.pathname;
             }}
-            className="px-8 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700"
+            className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700"
           >
             Создать новую игру
           </button>

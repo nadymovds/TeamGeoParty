@@ -86,7 +86,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
   const gameUrl = createGameUrl(gameId);
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 ${isHost ? 'mr-80' : ''}`}>
+    <div className={`min-h-screen bg-gray-50 p-4 ${isHost ? 'mr-80' : ''}`}>
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
           <h1 className="text-3xl font-bold mb-2">TeamGeo</h1>
@@ -114,8 +114,8 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
               </button>
             </div>
             {showCopyToast && (
-              <div className="mt-2 py-2 px-3 bg-green-100 text-green-700 text-sm rounded-lg border border-green-300 animate-pulse">
-                ✓ Ссылка скопирована в буфер обмена
+              <div className="mt-2 py-2 px-3 bg-blue-100 text-blue-700 text-sm rounded-lg border border-blue-300">
+                Ссылка скопирована в буфер обмена
               </div>
             )}
           </div>
@@ -135,7 +135,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
               />
               <button
                 onClick={handleJoin}
-                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 Присоединиться
               </button>
@@ -168,7 +168,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
             <button
               onClick={handleStartSetup}
               disabled={players.length < 2}
-              className="w-full px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               {players.length < 2
                 ? "Нужно минимум 2 игрока"

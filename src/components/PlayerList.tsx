@@ -32,14 +32,14 @@ export const PlayerList: React.FC<PlayerListProps> = ({
             <div className="flex items-center gap-2">
               <span className="font-medium">{player.name}</span>
               {player.isHost && (
-                <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">
+                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
                   Хост
                 </span>
               )}
             </div>
             <div className="flex items-center gap-2">
               {player.isReady && (
-                <span className="text-green-600 text-sm">✓ Готов</span>
+                <span className="text-blue-600 text-sm">Готов</span>
               )}
               <span className="text-gray-600 text-sm">
                 {player.totalScore} очков

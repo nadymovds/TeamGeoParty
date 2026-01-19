@@ -65,7 +65,7 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
   const locationAuthor = players.find((p) => p._id === activeLocation.playerId);
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 p-4 ${isHost ? 'mr-80' : ''}`}>
+    <div className={`min-h-screen bg-gray-50 p-4 ${isHost ? 'mr-80' : ''}`}>
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
           <h1 className="text-3xl font-bold mb-2">
@@ -103,7 +103,7 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
                     key={guess._id}
                     className={`p-3 rounded ${
                       index === 0
-                        ? "bg-green-100 border-2 border-green-500"
+                        ? "bg-blue-100 border-2 border-blue-500"
                         : "bg-gray-50"
                     }`}
                   >

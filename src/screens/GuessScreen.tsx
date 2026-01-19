@@ -71,7 +71,7 @@ export const GuessScreen: React.FC<GuessScreenProps> = ({ gameId }) => {
   const isHost = currentPlayer?.isHost;
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-orange-50 to-red-100 p-4 ${isHost ? 'mr-80' : ''}`}>
+    <div className={`min-h-screen bg-gray-50 p-4 ${isHost ? 'mr-80' : ''}`}>
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
           <h1 className="text-3xl font-bold mb-2">Раунд {game.currentRound ?? 1}</h1>
@@ -118,7 +118,7 @@ export const GuessScreen: React.FC<GuessScreenProps> = ({ gameId }) => {
             </p>
             <button
               onClick={handleSubmitGuess}
-              className="w-full px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700"
+              className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700"
             >
               Отправить ответ
             </button>
@@ -126,9 +126,9 @@ export const GuessScreen: React.FC<GuessScreenProps> = ({ gameId }) => {
         )}
 
         {hasSubmitted && (
-          <div className="bg-green-50 border-2 border-green-500 rounded-lg p-4">
-            <p className="text-center text-green-700 font-semibold">
-              ✓ Ваш ответ отправлен! Ожидайте других игроков...
+          <div className="bg-blue-50 border-2 border-blue-500 rounded-lg p-4">
+            <p className="text-center text-blue-700 font-semibold">
+              Ваш ответ отправлен! Ожидайте других игроков...
             </p>
           </div>
         )}

@@ -137,7 +137,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
   const isHost = currentPlayer?.isHost;
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 p-4 ${isHost ? 'mr-80' : ''}`}>
+    <div className={`min-h-screen bg-gray-50 p-4 ${isHost ? 'mr-80' : ''}`}>
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
           <h1 className="text-3xl font-bold mb-2">Настройка локаций</h1>
@@ -261,7 +261,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
                       {!currentPlayer.isReady && (
                         <button
                           onClick={() => handleRemoveLocation(loc._id)}
-                          className="ml-2 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+                          className="ml-2 px-3 py-1 bg-white text-blue-600 border border-blue-600 rounded hover:bg-blue-50 text-sm"
                         >
                           Удалить
                         </button>
@@ -282,9 +282,9 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
                   onClick={handleToggleReady}
                   className={`w-full px-4 py-3 rounded-lg font-semibold ${
                     currentPlayer.isReady
-                      ? "bg-gray-400 hover:bg-gray-500"
-                      : "bg-green-600 hover:bg-green-700"
-                  } text-white`}
+                      ? "bg-white text-blue-600 border-2 border-blue-600 hover:bg-blue-50"
+                      : "bg-blue-600 text-white hover:bg-blue-700"
+                  }`}
                 >
                   {currentPlayer.isReady ? "Не готов" : "Готов к игре"}
                 </button>
@@ -292,9 +292,9 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
             )}
 
             {allReady && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <p className="text-center text-green-700 font-semibold">
-                  ✓ Все игроки готовы! Игра начнется автоматически...
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-center text-blue-700 font-semibold">
+                  Все игроки готовы! Игра начнется автоматически...
                 </p>
               </div>
             )}

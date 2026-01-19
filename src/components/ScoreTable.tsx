@@ -30,7 +30,7 @@ export const ScoreTable: React.FC<ScoreTableProps> = ({ players, showAll = false
             key={player._id}
             className={`flex items-center justify-between p-3 rounded ${
               index === 0
-                ? "bg-yellow-100 border-2 border-yellow-400"
+                ? "bg-blue-100 border-2 border-blue-400"
                 : "bg-gray-50"
             }`}
           >

@@ -91,9 +91,9 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
 
   return (
     <div className="fixed right-0 top-0 h-screen w-80 bg-white shadow-2xl border-l border-gray-200 flex flex-col z-50">
-      <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-purple-600 to-indigo-600">
+      <div className="p-4 border-b border-gray-200 bg-blue-600">
         <h2 className="text-xl font-bold text-white">Панель хоста</h2>
-        <p className="text-sm text-purple-100">{game.status}</p>
+        <p className="text-sm text-blue-100">{game.status}</p>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -106,7 +106,7 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
           {game.status === "SETUP" && (
             <button
               onClick={handleForceStartGame}
-              className="w-full px-4 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors shadow-md"
+              className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md"
             >
               Начать игру
             </button>
@@ -123,7 +123,7 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
 
               <button
                 onClick={handleForceFinish}
-                className="w-full px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors"
+                className="w-full px-4 py-2 bg-white text-blue-600 border-2 border-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-colors"
               >
                 Завершить игру
               </button>
@@ -159,7 +159,7 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
                         {player.name}
                       </span>
                       {player.isHost && (
-                        <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded">
+                        <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
                           Хост
                         </span>
                       )}
