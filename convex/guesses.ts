@@ -80,3 +80,26 @@ export const getByPlayer = query({
       .first();
   },
 });
+
+export const listByGame = query({
+  args: { gameId: v.id("games") },
+  handler: async (ctx, args) => {
+    // Get all locations for the game
+    const locations = await ctx.db
+      .query("locations")
+      .withIndex("by_game", (q) => q.eq("gameId", args.gameId))
+      .collect();
+
+    // Get all guesses for each location
+    const allGuesses = [];
+    for (const location of locations) {
+      const guesses = await ctx.db
+        .query("guesses")
+        .withIndex("by_location", (q) => q.eq("locationId", location._id))
+        .collect();
+      allGuesses.push(...guesses);
+    }
+
+    return allGuesses;
+  },
+});

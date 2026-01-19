@@ -37,21 +37,21 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
     );
   }
 
-  // Create markers for map
+  // Create markers for map - green for correct location, red for guesses
   const markers = [
     {
       lat: activeLocation.lat,
       lng: activeLocation.lng,
-      label: "🎯",
       title: "Правильное место",
+      color: "green" as const,
     },
     ...guesses.map((guess) => {
       const player = players.find((p) => p._id === guess.playerId);
       return {
         lat: guess.lat,
         lng: guess.lng,
-        label: "📍",
         title: player?.name ?? "Игрок",
+        color: "red" as const,
       };
     }),
   ];
@@ -71,7 +71,7 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
             Подсказка была: {activeLocation.hint}
           </p>
           <p className="text-sm text-gray-500">
-            Правильное место отмечено 🎯 на карте
+            Правильное место отмечено зеленым маркером на карте
           </p>
         </div>
 
@@ -119,7 +119,7 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
           </div>
         </div>
 
-        <ScoreTable players={players} />
+        <ScoreTable players={players} showAll={isHost} />
 
         {!isHost && (
           <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">

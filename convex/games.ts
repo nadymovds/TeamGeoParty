@@ -1,6 +1,23 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
+// Seeded random shuffle for consistent order based on gameId
+const seededShuffle = <T>(array: T[], seed: string): T[] => {
+  const result = [...array];
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+    hash = hash & hash;
+  }
+  for (let i = result.length - 1; i > 0; i--) {
+    hash = ((hash << 5) - hash) + i;
+    hash = hash & hash;
+    const j = Math.abs(hash) % (i + 1);
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+};
+
 export const create = mutation({
   args: {
     hostName: v.string(),
@@ -148,9 +165,8 @@ export const forceNextRound = mutation({
       }
       console.log("forceNextRound: Found", locations.length, "locations");
 
-      const sortedLocations = [...locations].sort((a, b) =>
-        a.hint.localeCompare(b.hint)
-      );
+      // Shuffle locations randomly based on gameId for consistent order
+      const shuffledLocations = seededShuffle(locations, args.gameId);
 
       // Get all players and filter participating ones
       console.log("forceNextRound: Fetching players");
@@ -233,12 +249,12 @@ export const forceNextRound = mutation({
 
         // Find next location
         console.log("forceNextRound: Finding next location");
-        const currentIndex = sortedLocations.findIndex(
+        const currentIndex = shuffledLocations.findIndex(
           (loc) => loc._id === game.activeLocationId
         );
 
-        if (currentIndex !== -1 && currentIndex < sortedLocations.length - 1) {
-          const nextLocation = sortedLocations[currentIndex + 1];
+        if (currentIndex !== -1 && currentIndex < shuffledLocations.length - 1) {
+          const nextLocation = shuffledLocations[currentIndex + 1];
           console.log("forceNextRound: Moving to next round with location", nextLocation.hint);
           // Start next round immediately (NO intermediate RESULTS status)
           await ctx.db.patch(args.gameId, {
@@ -262,12 +278,12 @@ export const forceNextRound = mutation({
           throw new Error("No active location in RESULTS state");
         }
 
-        const currentIndex = sortedLocations.findIndex(
+        const currentIndex = shuffledLocations.findIndex(
           (loc) => loc._id === game.activeLocationId
         );
 
-        if (currentIndex !== -1 && currentIndex < sortedLocations.length - 1) {
-          const nextLocation = sortedLocations[currentIndex + 1];
+        if (currentIndex !== -1 && currentIndex < shuffledLocations.length - 1) {
+          const nextLocation = shuffledLocations[currentIndex + 1];
           console.log("forceNextRound: Moving to next round with location", nextLocation.hint);
           await ctx.db.patch(args.gameId, {
             status: "PLAYING",
@@ -315,12 +331,10 @@ export const forceStartGame = mutation({
       throw new Error("Нужна хотя бы одна локация для начала игры");
     }
 
-    // Sort locations consistently
-    const sortedLocations = [...locations].sort((a, b) =>
-      a.hint.localeCompare(b.hint)
-    );
+    // Shuffle locations randomly based on gameId for consistent order
+    const shuffledLocations = seededShuffle(locations, args.gameId);
 
-    const firstLocation = sortedLocations[0];
+    const firstLocation = shuffledLocations[0];
 
     // Start the first round
     await ctx.db.patch(args.gameId, {

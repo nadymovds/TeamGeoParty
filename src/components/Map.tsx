@@ -17,6 +17,7 @@ interface MapMarker {
   lng: number;
   label?: string;
   title?: string; // Подпись под маркером
+  color?: "red" | "green" | "blue"; // Marker color
 }
 
 interface MapProps {
@@ -105,11 +106,27 @@ export const Map: React.FC<MapProps> = ({
       options={mapOptions}
       onLoad={onMapLoad}
     >
-      {markers.map((marker, index) => (
+      {markers.map((marker, index) => {
+        // Get marker icon URL based on color
+        const getMarkerIcon = (color?: string) => {
+          switch (color) {
+            case "green":
+              return "http://maps.google.com/mapfiles/ms/icons/green-dot.png";
+            case "blue":
+              return "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+            case "red":
+              return "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
+            default:
+              return undefined;
+          }
+        };
+
+        return (
         <React.Fragment key={index}>
           <Marker
             position={{ lat: marker.lat, lng: marker.lng }}
             label={marker.label}
+            icon={getMarkerIcon(marker.color)}
             onMouseOver={() => setHoveredMarker(index)}
             onMouseOut={() => setHoveredMarker(null)}
           />
@@ -127,7 +144,8 @@ export const Map: React.FC<MapProps> = ({
             </InfoWindow>
           )}
         </React.Fragment>
-      ))}
+        );
+      })}
     </GoogleMap>
   );
 };

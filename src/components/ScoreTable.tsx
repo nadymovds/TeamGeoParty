@@ -9,18 +9,23 @@ interface Player {
 
 interface ScoreTableProps {
   players: Player[];
+  showAll?: boolean; // If true, show all players; if false, show only top 3
 }
 
-export const ScoreTable: React.FC<ScoreTableProps> = ({ players }) => {
+export const ScoreTable: React.FC<ScoreTableProps> = ({ players, showAll = false }) => {
   const sortedPlayers = [...players].sort(
     (a, b) => b.totalScore - a.totalScore
   );
+
+  // Show only top 3 for regular users, all players for host
+  const displayPlayers = showAll ? sortedPlayers : sortedPlayers.slice(0, 3);
+  const hasMorePlayers = !showAll && sortedPlayers.length > 3;
 
   return (
     <div className="bg-white rounded-lg shadow p-4">
       <h3 className="text-xl font-bold mb-4">Таблица лидеров</h3>
       <div className="space-y-2">
-        {sortedPlayers.map((player, index) => (
+        {displayPlayers.map((player, index) => (
           <div
             key={player._id}
             className={`flex items-center justify-between p-3 rounded ${
@@ -38,6 +43,11 @@ export const ScoreTable: React.FC<ScoreTableProps> = ({ players }) => {
             <span className="font-bold text-lg">{player.totalScore} очков</span>
           </div>
         ))}
+        {hasMorePlayers && (
+          <div className="text-center text-gray-500 text-sm pt-2">
+            и еще {sortedPlayers.length - 3} игроков...
+          </div>
+        )}
       </div>
     </div>
   );

@@ -46,12 +46,28 @@ interface GameContentInnerProps {
   gameId: Id<"games">;
 }
 
+// Seeded random shuffle for consistent order based on gameId
+const seededShuffle = <T,>(array: T[], seed: string): T[] => {
+  const result = [...array];
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+    hash = hash & hash;
+  }
+  for (let i = result.length - 1; i > 0; i--) {
+    hash = ((hash << 5) - hash) + i;
+    hash = hash & hash;
+    const j = Math.abs(hash) % (i + 1);
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+};
+
 const GameContentInner: React.FC<GameContentInnerProps> = ({ game, gameId }) => {
   const players = useQuery(api.players.list, { gameId });
   const locations = useQuery(api.locations.list, { gameId });
   const startRound = useMutation(api.games.startRound);
   const finishRound = useMutation(api.games.finishRound);
-  const finishGame = useMutation(api.games.finishGame);
   const updateHeartbeat = useMutation(api.players.updateHeartbeat);
 
   // Send heartbeat every 5 seconds to track online status
@@ -78,14 +94,12 @@ const GameContentInner: React.FC<GameContentInnerProps> = ({ game, gameId }) => 
       players.every((p) => p.isReady) &&
       locations.length > 0
     ) {
-      // Sort locations for consistent order
-      const sortedLocations = [...locations].sort((a, b) =>
-        a.hint.localeCompare(b.hint)
-      );
+      // Shuffle locations randomly based on gameId for consistent order
+      const shuffledLocations = seededShuffle(locations, gameId);
 
       // Increased delay to ensure Google Maps API is loaded
       const timer = setTimeout(async () => {
-        const firstLocation = sortedLocations[0];
+        const firstLocation = shuffledLocations[0];
         if (firstLocation) {
           await startRound({
             gameId,
@@ -126,20 +140,7 @@ const GameContentInner: React.FC<GameContentInnerProps> = ({ game, gameId }) => 
     }
   }, [game.status, players, guesses, game.activeLocationId, gameId, finishRound]);
 
-  // Auto-finish game when all locations are played
-  useEffect(() => {
-    if (
-      game.status === "RESULTS" &&
-      locations &&
-      game.currentRound &&
-      game.currentRound >= locations.length
-    ) {
-      const timer = setTimeout(async () => {
-        await finishGame({ gameId });
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [game.status, game.currentRound, locations, gameId, finishGame]);
+  // Auto-finish game disabled - host controls transition to final screen via HostMenu
 
   const renderScreen = () => {
     switch (game.status) {

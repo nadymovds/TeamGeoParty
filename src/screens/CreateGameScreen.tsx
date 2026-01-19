@@ -40,7 +40,7 @@ export const CreateGameScreen: React.FC = () => {
       <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
         <h1 className="text-3xl font-bold mb-2 text-center">TeamGeo</h1>
         <p className="text-gray-600 text-center mb-6">
-          Мультиплеерная игра команды
+          Мультиплеерная игра для команды
         </p>
 
         <div className="space-y-4">
@@ -84,7 +84,7 @@ export const CreateGameScreen: React.FC = () => {
                 <li>Скопируйте ключ (начинается с AIza...)</li>
               </ol>
               <p className="text-xs text-indigo-600 mt-2">
-                Новым пользователям Google Cloud даёт $300 бесплатного кредита.
+                Google даёт достаточно ежемесячных бесплатных кредитов.
               </p>
             </div>
           </div>
