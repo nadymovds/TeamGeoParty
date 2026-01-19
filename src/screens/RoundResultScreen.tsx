@@ -3,6 +3,7 @@ import { useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { Id } from "../convex/_generated/dataModel";
 import { Map } from "../components/Map";
+import { StreetView } from "../components/StreetView";
 import { ScoreTable } from "../components/ScoreTable";
 import { HostMenu } from "../components/HostMenu";
 import { getSessionId } from "../utils";
@@ -60,6 +61,9 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
   const sortedGuesses = [...guesses].sort((a, b) => a.distance - b.distance);
   const isHost = currentPlayer?.isHost;
 
+  // Find the author of this location
+  const locationAuthor = players.find((p) => p._id === activeLocation.playerId);
+
   return (
     <div className={`min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 p-4 ${isHost ? 'mr-80' : ''}`}>
       <div className="max-w-6xl mx-auto">
@@ -68,11 +72,16 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
             Результаты раунда {game.currentRound ?? 1}
           </h1>
           <p className="text-xl text-gray-700 mb-2 font-medium">
-            Подсказка была: {activeLocation.hint}
+            Подсказка от {locationAuthor?.name ?? "Игрока"}: «{activeLocation.hint}»
           </p>
           <p className="text-sm text-gray-500">
             Правильное место отмечено зеленым маркером на карте
           </p>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-lg p-4 mb-4">
+          <h2 className="text-lg font-semibold mb-3">Панорама:</h2>
+          <StreetView lat={activeLocation.lat} lng={activeLocation.lng} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
