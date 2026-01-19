@@ -293,6 +293,44 @@ export const forceNextRound = mutation({
   },
 });
 
+export const forceStartGame = mutation({
+  args: { gameId: v.id("games") },
+  handler: async (ctx, args) => {
+    const game = await ctx.db.get(args.gameId);
+    if (!game) {
+      throw new Error("Game not found");
+    }
+
+    if (game.status !== "SETUP") {
+      throw new Error("Game is not in SETUP state");
+    }
+
+    // Get all locations
+    const locations = await ctx.db
+      .query("locations")
+      .withIndex("by_game", (q) => q.eq("gameId", args.gameId))
+      .collect();
+
+    if (locations.length === 0) {
+      throw new Error("Нужна хотя бы одна локация для начала игры");
+    }
+
+    // Sort locations consistently
+    const sortedLocations = [...locations].sort((a, b) =>
+      a.hint.localeCompare(b.hint)
+    );
+
+    const firstLocation = sortedLocations[0];
+
+    // Start the first round
+    await ctx.db.patch(args.gameId, {
+      status: "PLAYING",
+      activeLocationId: firstLocation._id,
+      currentRound: 1,
+    });
+  },
+});
+
 export const forceFinishGame = mutation({
   args: { gameId: v.id("games") },
   handler: async (ctx, args) => {

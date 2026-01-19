@@ -22,6 +22,7 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
 
   const forceNextRound = useMutation(api.games.forceNextRound);
   const forceFinishGame = useMutation(api.games.forceFinishGame);
+  const forceStartGame = useMutation(api.games.forceStartGame);
 
   if (!currentPlayer?.isHost || !game || !players) {
     return null;
@@ -60,6 +61,25 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
     }
   };
 
+  const handleForceStartGame = async () => {
+    const participatingPlayers = players.filter(p => p.isParticipating);
+    const notReadyPlayers = participatingPlayers.filter(p => !p.isReady);
+
+    let message = "Начать игру принудительно?";
+    if (notReadyPlayers.length > 0) {
+      const playerNames = notReadyPlayers.map(p => p.name).join(", ");
+      message = `Начать игру принудительно?\n\nНе готовы (${notReadyPlayers.length}): ${playerNames}\n\nИгроки без локаций не смогут участвовать в угадывании своих мест.`;
+    }
+
+    if (confirm(message)) {
+      try {
+        await forceStartGame({ gameId });
+      } catch (err) {
+        alert(err instanceof Error ? err.message : "Ошибка запуска игры");
+      }
+    }
+  };
+
   const isOnline = (lastSeenAt?: number) => {
     if (!lastSeenAt) return false;
     return Date.now() - lastSeenAt < 10000; // Online if seen in last 10 seconds
@@ -82,6 +102,15 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
           <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
             Управление
           </h3>
+
+          {game.status === "SETUP" && (
+            <button
+              onClick={handleForceStartGame}
+              className="w-full px-4 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors shadow-md"
+            >
+              Начать игру
+            </button>
+          )}
 
           {(game.status === "PLAYING" || game.status === "RESULTS") && (
             <button

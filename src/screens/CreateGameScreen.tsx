@@ -40,7 +40,7 @@ export const CreateGameScreen: React.FC = () => {
       <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
         <h1 className="text-3xl font-bold mb-2 text-center">TeamGeo</h1>
         <p className="text-gray-600 text-center mb-6">
-          Мультиплеерная игра для тимбилдинга
+          Мультиплеерная игра команды
         </p>
 
         <div className="space-y-4">

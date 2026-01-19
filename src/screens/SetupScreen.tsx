@@ -40,9 +40,22 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | undefined>(undefined);
   const [mapZoom, setMapZoom] = useState<number | undefined>(undefined);
   const [isSearching, setIsSearching] = useState(false);
+  const [hasPanorama, setHasPanorama] = useState<boolean | null>(null);
+  const [checkingPanorama, setCheckingPanorama] = useState(false);
 
   const handleMapClick = (lat: number, lng: number) => {
     setSelectedLocation({ lat, lng });
+    setHasPanorama(null);
+    setCheckingPanorama(true);
+
+    const streetViewService = new google.maps.StreetViewService();
+    streetViewService.getPanorama(
+      { location: { lat, lng }, radius: 50 },
+      (data, status) => {
+        setCheckingPanorama(false);
+        setHasPanorama(status === google.maps.StreetViewStatus.OK && !!data?.location?.latLng);
+      }
+    );
   };
 
   const handleSearchAddress = () => {
@@ -209,11 +222,16 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
                   />
                   <button
                     onClick={handleAddLocation}
-                    disabled={!hint.trim() || locationsCount >= locationsNeeded}
+                    disabled={!hint.trim() || locationsCount >= locationsNeeded || !hasPanorama || checkingPanorama}
                     className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
                   >
-                    Добавить локацию
+                    {checkingPanorama ? "Проверка панорамы..." : "Добавить локацию"}
                   </button>
+                  {hasPanorama === false && (
+                    <p className="text-sm text-red-600 mt-1">
+                      В этой точке нет панорамы Street View. Выберите другое место ближе к дороге.
+                    </p>
+                  )}
                 </div>
               )}
 

@@ -91,7 +91,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
         <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
           <h1 className="text-3xl font-bold mb-2">TeamGeo</h1>
           <p className="text-gray-600 mb-4">
-            Мультиплеерная игра для тимбилдинга
+            Мультиплеерная игра команды
           </p>
 
           <div className="bg-blue-50 p-4 rounded-lg mb-4">
