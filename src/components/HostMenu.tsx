@@ -113,20 +113,22 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
           )}
 
           {(game.status === "PLAYING" || game.status === "RESULTS") && (
-            <button
-              onClick={handleForceNextRound}
-              className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md"
-            >
-              Следующий раунд
-            </button>
-          )}
+            <>
+              <button
+                onClick={handleForceNextRound}
+                className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md"
+              >
+                Следующий раунд
+              </button>
 
-          <button
-            onClick={handleForceFinish}
-            className="w-full px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors"
-          >
-            Завершить игру
-          </button>
+              <button
+                onClick={handleForceFinish}
+                className="w-full px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors"
+              >
+                Завершить игру
+              </button>
+            </>
+          )}
         </div>
 
         {/* Player List */}
