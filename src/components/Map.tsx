@@ -26,6 +26,7 @@ interface MapProps {
   onClick?: (lat: number, lng: number) => void;
   zoom?: number;
   showStreetViewCoverage?: boolean;
+  disableStreetView?: boolean; // Hide the pegman control
 }
 
 export const Map: React.FC<MapProps> = ({
@@ -34,6 +35,7 @@ export const Map: React.FC<MapProps> = ({
   onClick,
   zoom = 2,
   showStreetViewCoverage = false,
+  disableStreetView = false,
 }) => {
   const { isLoaded, loadError } = useGoogleMaps();
   const [hoveredMarker, setHoveredMarker] = useState<number | null>(null);
@@ -77,8 +79,9 @@ export const Map: React.FC<MapProps> = ({
       scrollwheel: true,
       zoomControl: true,
       mapTypeControl: false,
+      streetViewControl: !disableStreetView,
     }),
-    []
+    [disableStreetView]
   );
 
   if (loadError) {

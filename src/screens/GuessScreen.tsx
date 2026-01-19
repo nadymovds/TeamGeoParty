@@ -106,6 +106,7 @@ export const GuessScreen: React.FC<GuessScreenProps> = ({ gameId }) => {
                   ]
                 : []
             }
+            disableStreetView={true}
           />
         </div>
 
