@@ -86,7 +86,7 @@ export const FinalScreen: React.FC<FinalScreenProps> = ({ gameId }) => {
           <Map
             center={mapCenter}
             markers={markers}
-            zoom={2}
+            fitBounds={true}
           />
         </div>
 

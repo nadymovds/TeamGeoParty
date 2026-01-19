@@ -27,6 +27,7 @@ interface MapProps {
   zoom?: number;
   showStreetViewCoverage?: boolean;
   disableStreetView?: boolean; // Hide the pegman control
+  fitBounds?: boolean; // Auto-fit map to show all markers
 }
 
 export const Map: React.FC<MapProps> = ({
@@ -36,6 +37,7 @@ export const Map: React.FC<MapProps> = ({
   zoom = 2,
   showStreetViewCoverage = false,
   disableStreetView = false,
+  fitBounds = false,
 }) => {
   const { isLoaded, loadError } = useGoogleMaps();
   const [hoveredMarker, setHoveredMarker] = useState<number | null>(null);
@@ -60,6 +62,18 @@ export const Map: React.FC<MapProps> = ({
       }
     }
   }, [showStreetViewCoverage, isLoaded]);
+
+  // Fit map bounds to show all markers (client-side, no API cost)
+  useEffect(() => {
+    if (!mapRef.current || !isLoaded || !fitBounds || markers.length === 0) return;
+
+    const bounds = new google.maps.LatLngBounds();
+    markers.forEach((marker) => {
+      bounds.extend({ lat: marker.lat, lng: marker.lng });
+    });
+
+    mapRef.current.fitBounds(bounds, 50); // 50px padding
+  }, [fitBounds, markers, isLoaded]);
 
   const onMapClick = useCallback(
     (e: google.maps.MapMouseEvent | google.maps.IconMouseEvent) => {

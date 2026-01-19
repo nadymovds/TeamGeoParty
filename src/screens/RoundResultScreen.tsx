@@ -89,7 +89,7 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
             <Map
               center={{ lat: activeLocation.lat, lng: activeLocation.lng }}
               markers={markers}
-              zoom={4}
+              fitBounds={true}
             />
           </div>
 
