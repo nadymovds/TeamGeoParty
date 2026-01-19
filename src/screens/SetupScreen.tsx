@@ -35,7 +35,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
     lng: number;
   } | null>(null);
   const [hint, setHint] = useState("");
-  const [showStreetViewCoverage, setShowStreetViewCoverage] = useState(true);
+  const [showStreetViewCoverage, setShowStreetViewCoverage] = useState(false);
 
   const handleMapClick = (lat: number, lng: number) => {
     setSelectedLocation({ lat, lng });
