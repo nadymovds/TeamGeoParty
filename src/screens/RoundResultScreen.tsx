@@ -59,9 +59,8 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
     },
   ];
 
-  // Sort guesses by distance
+  // Filter valid guesses (exclude dummy guesses from players who didn't guess)
   const validGuesses = guesses.filter((guess) => !(guess.lat === 0 && guess.lng === 0));
-  const sortedGuesses = [...validGuesses].sort((a, b) => a.distance - b.distance);
 
   // Create player results including those who didn't guess
   const playerResults = players.map((player) => {
