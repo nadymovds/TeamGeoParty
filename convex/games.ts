@@ -117,6 +117,8 @@ export const startRound = mutation({
       status: "PLAYING",
       activeLocationId: args.locationId,
       currentRound: args.round,
+      timerEnd: undefined,
+      timerDuration: undefined,
     });
   },
 });
@@ -303,6 +305,8 @@ export const forceNextRound = mutation({
             status: "PLAYING",
             activeLocationId: nextLocation._id,
             currentRound: (game.currentRound ?? 1) + 1,
+            timerEnd: undefined,
+            timerDuration: undefined,
           });
           console.log("forceNextRound: Successfully moved to next round");
         } else {
@@ -355,6 +359,8 @@ export const forceStartGame = mutation({
       status: "PLAYING",
       activeLocationId: firstLocation._id,
       currentRound: 1,
+      timerEnd: undefined,
+      timerDuration: undefined,
     });
   },
 });

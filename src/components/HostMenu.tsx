@@ -169,10 +169,16 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
             {game.timerEnd && (
               <div className="flex gap-2">
                 <button
+                  onClick={() => addTimeToTimer({ gameId, additionalSeconds: 30 })}
+                  className="flex-1 px-2 py-2 bg-yellow-600 text-white rounded text-sm font-medium hover:bg-yellow-700 transition-colors"
+                >
+                  +30с
+                </button>
+                <button
                   onClick={() => addTimeToTimer({ gameId, additionalSeconds: 60 })}
                   className="flex-1 px-2 py-2 bg-yellow-600 text-white rounded text-sm font-medium hover:bg-yellow-700 transition-colors"
                 >
-                  +1 мин
+                  +1м
                 </button>
                 <button
                   onClick={() => stopTimer({ gameId })}

@@ -100,7 +100,12 @@ export const GuessScreen: React.FC<GuessScreenProps> = ({ gameId }) => {
         </div>
 
         <div className="bg-white rounded-lg shadow-lg p-4 mb-4">
-          <h2 className="text-xl font-semibold mb-4">Ваше предположение:</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Ваше предположение:</h2>
+            {game.timerEnd && !isHost && (
+              <Timer endTime={game.timerEnd} />
+            )}
+          </div>
           <Map
             onClick={hasSubmitted ? undefined : handleMapClick}
             markers={
