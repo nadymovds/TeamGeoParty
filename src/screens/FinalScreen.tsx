@@ -37,6 +37,18 @@ export const FinalScreen: React.FC<FinalScreenProps> = ({ gameId }) => {
 
   // Create markers for map - green for all correct locations, red for all guesses
   const markers = [
+    ...allGuesses
+      .filter((guess) => !(guess.lat === 0 && guess.lng === 0)) // Exclude dummy guesses
+      .map((guess) => {
+        const player = players.find((p) => p._id === guess.playerId);
+        const location = locations.find((l) => l._id === guess.locationId);
+        return {
+          lat: guess.lat,
+          lng: guess.lng,
+          title: `${player?.name ?? "Игрок"}: ${location?.hint ?? ""}`,
+          color: "red" as const,
+        };
+      }),
     ...locations.map((loc) => {
       const player = players.find((p) => p._id === loc.playerId);
       return {
@@ -44,16 +56,6 @@ export const FinalScreen: React.FC<FinalScreenProps> = ({ gameId }) => {
         lng: loc.lng,
         title: `${loc.hint} (${player?.name ?? "Игрок"})`,
         color: "green" as const,
-      };
-    }),
-    ...allGuesses.map((guess) => {
-      const player = players.find((p) => p._id === guess.playerId);
-      const location = locations.find((l) => l._id === guess.locationId);
-      return {
-        lat: guess.lat,
-        lng: guess.lng,
-        title: `${player?.name ?? "Игрок"}: ${location?.hint ?? ""}`,
-        color: "red" as const,
       };
     }),
   ];

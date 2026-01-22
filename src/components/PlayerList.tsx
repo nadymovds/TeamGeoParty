@@ -18,9 +18,13 @@ export const PlayerList: React.FC<PlayerListProps> = ({
   players,
   currentPlayerId,
 }) => {
+  const readyCount = players.filter((player) => player.isReady).length;
+
   return (
     <div className="bg-white rounded-lg shadow p-4">
-      <h3 className="text-lg font-semibold mb-3">Игроки ({players.length})</h3>
+      <h3 className="text-lg font-semibold mb-3">
+        Игроки (готово {readyCount}/{players.length})
+      </h3>
       <div className="space-y-2">
         {players.map((player) => (
           <div

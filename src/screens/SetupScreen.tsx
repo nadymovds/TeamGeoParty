@@ -6,6 +6,7 @@ import { Map } from "../components/Map";
 import { StreetView } from "../components/StreetView";
 import { PlayerList } from "../components/PlayerList";
 import { HostMenu } from "../components/HostMenu";
+import { Timer } from "../components/Timer";
 import { getSessionId } from "../utils";
 import { useGoogleMaps } from "../contexts/GoogleMapsContext";
 import { getPanoramaWithCache } from "../utils/panoramaCache";
@@ -140,10 +141,17 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
     <div className={`min-h-screen bg-gray-50 p-4 ${isHost ? 'mr-80' : ''}`}>
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
-          <h1 className="text-3xl font-bold mb-2">Настройка локаций</h1>
-          <p className="text-gray-600 mb-4">
-            Добавьте {locationsNeeded} значимых для вас мест на карте
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">Настройка локаций</h1>
+              <p className="text-gray-600 mb-4">
+                Добавьте {locationsNeeded} значимых для вас мест на карте
+              </p>
+            </div>
+            {game.timerEnd && (
+              <Timer endTime={game.timerEnd} />
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

@@ -17,6 +17,8 @@ export default defineSchema({
     }),
     currentRound: v.optional(v.number()),
     totalRounds: v.optional(v.number()),
+    timerEnd: v.optional(v.number()), // Timestamp when timer expires
+    timerDuration: v.optional(v.number()), // Duration in seconds
   }),
 
   players: defineTable({

@@ -5,6 +5,7 @@ import { Id } from "../convex/_generated/dataModel";
 import { Map } from "../components/Map";
 import { StreetView } from "../components/StreetView";
 import { HostMenu } from "../components/HostMenu";
+import { Timer } from "../components/Timer";
 import { getSessionId } from "../utils";
 import { useGoogleMaps } from "../contexts/GoogleMapsContext";
 
@@ -74,13 +75,20 @@ export const GuessScreen: React.FC<GuessScreenProps> = ({ gameId }) => {
     <div className={`min-h-screen bg-gray-50 p-4 ${isHost ? 'mr-80' : ''}`}>
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
-          <h1 className="text-3xl font-bold mb-2">Раунд {game.currentRound ?? 1}</h1>
-          <p className="text-xl text-gray-700 mb-4 font-medium">
-            Подсказка: {activeLocation.hint}
-          </p>
-          <p className="text-sm text-gray-500">
-            Посмотрите на панораму и отметьте на карте, где это находится
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">Раунд {game.currentRound ?? 1}</h1>
+              <p className="text-xl text-gray-700 mb-4 font-medium">
+                Подсказка: {activeLocation.hint}
+              </p>
+              <p className="text-sm text-gray-500">
+                Посмотрите на панораму и отметьте на карте, где это находится
+              </p>
+            </div>
+            {game.timerEnd && (
+              <Timer endTime={game.timerEnd} />
+            )}
+          </div>
         </div>
 
         <div className="bg-white rounded-lg shadow-lg p-4 mb-4">

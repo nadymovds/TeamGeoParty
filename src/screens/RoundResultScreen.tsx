@@ -40,25 +40,39 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
 
   // Create markers for map - green for correct location, red for guesses
   const markers = [
+    ...guesses
+      .filter((guess) => !(guess.lat === 0 && guess.lng === 0)) // Exclude dummy guesses
+      .map((guess) => {
+        const player = players.find((p) => p._id === guess.playerId);
+        return {
+          lat: guess.lat,
+          lng: guess.lng,
+          title: player?.name ?? "Игрок",
+          color: "red" as const,
+        };
+      }),
     {
       lat: activeLocation.lat,
       lng: activeLocation.lng,
       title: "Правильное место",
       color: "green" as const,
     },
-    ...guesses.map((guess) => {
-      const player = players.find((p) => p._id === guess.playerId);
-      return {
-        lat: guess.lat,
-        lng: guess.lng,
-        title: player?.name ?? "Игрок",
-        color: "red" as const,
-      };
-    }),
   ];
 
   // Sort guesses by distance
-  const sortedGuesses = [...guesses].sort((a, b) => a.distance - b.distance);
+  const validGuesses = guesses.filter((guess) => !(guess.lat === 0 && guess.lng === 0));
+  const sortedGuesses = [...validGuesses].sort((a, b) => a.distance - b.distance);
+
+  // Create player results including those who didn't guess
+  const playerResults = players.map((player) => {
+    const guess = validGuesses.find((g) => g.playerId === player._id);
+    return { player, guess };
+  }).sort((a, b) => {
+    if (!a.guess && !b.guess) return 0;
+    if (!a.guess) return 1;
+    if (!b.guess) return -1;
+    return a.guess.distance - b.guess.distance;
+  });
   const isHost = currentPlayer?.isHost;
 
   // Find the author of this location
@@ -96,34 +110,35 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
           <div className="bg-white rounded-lg shadow-lg p-4">
             <h3 className="text-lg font-semibold mb-4">Результаты игроков</h3>
             <div className="space-y-2">
-              {sortedGuesses.map((guess, index) => {
-                const player = players.find((p) => p._id === guess.playerId);
-                return (
-                  <div
-                    key={guess._id}
-                    className={`p-3 rounded ${
-                      index === 0
-                        ? "bg-blue-100 border-2 border-blue-500"
-                        : "bg-gray-50"
-                    }`}
-                  >
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <span className="font-semibold">
-                          {index + 1}. {player?.name ?? "Unknown"}
-                        </span>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-sm text-gray-600">
-                          {guess.distance < 1
+              {playerResults.map(({ player, guess }, index) => (
+                <div
+                  key={player._id}
+                  className={`p-3 rounded ${
+                    index === 0 && guess
+                      ? "bg-blue-100 border-2 border-blue-500"
+                      : "bg-gray-50"
+                  }`}
+                >
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <span className="font-semibold">
+                        {index + 1}. {player.name}
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-sm text-gray-600">
+                        {guess ? (
+                          guess.distance < 1
                             ? `${Math.round(guess.distance * 1000)} м`
-                            : `${guess.distance.toFixed(2)} км`}
-                        </span>
-                      </div>
+                            : `${guess.distance.toFixed(2)} км`
+                        ) : (
+                          "Не угадывал"
+                        )}
+                      </span>
                     </div>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           </div>
         </div>

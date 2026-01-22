@@ -379,3 +379,59 @@ export const forceFinishGame = mutation({
     }
   },
 });
+
+export const startTimer = mutation({
+  args: {
+    gameId: v.id("games"),
+    durationSeconds: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const game = await ctx.db.get(args.gameId);
+    if (!game) {
+      throw new Error("Game not found");
+    }
+
+    const now = Date.now();
+    const timerEnd = now + args.durationSeconds * 1000;
+
+    await ctx.db.patch(args.gameId, {
+      timerEnd,
+      timerDuration: args.durationSeconds,
+    });
+  },
+});
+
+export const stopTimer = mutation({
+  args: { gameId: v.id("games") },
+  handler: async (ctx, args) => {
+    const game = await ctx.db.get(args.gameId);
+    if (!game) {
+      throw new Error("Game not found");
+    }
+
+    await ctx.db.patch(args.gameId, {
+      timerEnd: undefined,
+      timerDuration: undefined,
+    });
+  },
+});
+
+export const addTimeToTimer = mutation({
+  args: {
+    gameId: v.id("games"),
+    additionalSeconds: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const game = await ctx.db.get(args.gameId);
+    if (!game || !game.timerEnd) {
+      throw new Error("No active timer");
+    }
+
+    const newTimerEnd = game.timerEnd + args.additionalSeconds * 1000;
+
+    await ctx.db.patch(args.gameId, {
+      timerEnd: newTimerEnd,
+      timerDuration: (newTimerEnd - Date.now()) / 1000,
+    });
+  },
+});
