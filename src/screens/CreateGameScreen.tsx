@@ -8,6 +8,8 @@ export const CreateGameScreen: React.FC = () => {
   const [googleApiKey, setGoogleApiKey] = useState("");
   const [locationsPerPlayer, setLocationsPerPlayer] = useState(3);
   const [error, setError] = useState<string | null>(null);
+  const [showHowToGet, setShowHowToGet] = useState(false);
+  const [showProtection, setShowProtection] = useState(false);
   const createGame = useMutation(api.games.create);
 
   const handleCreateGame = async () => {
@@ -69,40 +71,62 @@ export const CreateGameScreen: React.FC = () => {
               placeholder="AIza..."
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
-            <div className="mt-2 p-3 bg-blue-50 rounded-lg">
-              <p className="text-xs font-medium text-blue-800 mb-2">Как получить ключ:</p>
-              <ol className="text-xs text-blue-700 space-y-1 list-decimal list-inside">
-                <li>Откройте <a
-                  href="https://console.cloud.google.com/google/maps-apis"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline font-medium"
-                >Google Cloud Console</a></li>
-                <li>Создайте проект (или выберите существующий)</li>
-                <li>Включите APIs: <span className="font-medium">Maps JavaScript API</span> и <span className="font-medium">Street View Static API</span></li>
-                <li>Перейдите в "Credentials" → "Create Credentials" → "API Key"</li>
-                <li>Скопируйте ключ (начинается с AIza...)</li>
-              </ol>
-              <p className="text-xs text-blue-600 mt-2">
-                Google даёт достаточно ежемесячных бесплатных кредитов.
-              </p>
+            <div className="mt-2 bg-blue-50 rounded-lg overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setShowHowToGet(!showHowToGet)}
+                className="w-full p-3 flex items-center justify-between text-left hover:bg-blue-100 transition-colors"
+              >
+                <span className="text-xs font-medium text-blue-800">Как получить ключ</span>
+                <span className={`text-blue-600 transition-transform ${showHowToGet ? 'rotate-180' : ''}`}>▼</span>
+              </button>
+              {showHowToGet && (
+                <div className="px-3 pb-3">
+                  <ol className="text-xs text-blue-700 space-y-1 list-decimal list-inside">
+                    <li>Откройте <a
+                      href="https://console.cloud.google.com/google/maps-apis"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline font-medium"
+                    >Google Cloud Console</a></li>
+                    <li>Создайте проект (или выберите существующий)</li>
+                    <li>Включите APIs: <span className="font-medium">Maps JavaScript API</span> и <span className="font-medium">Street View Static API</span></li>
+                    <li>Перейдите в "Credentials" → "Create Credentials" → "API Key"</li>
+                    <li>Скопируйте ключ (начинается с AIza...)</li>
+                  </ol>
+                  <p className="text-xs text-blue-600 mt-2">
+                    Google даёт достаточно ежемесячных бесплатных кредитов.
+                  </p>
+                </div>
+              )}
             </div>
-            <div className="mt-2 p-3 bg-amber-50 rounded-lg border border-amber-200">
-              <p className="text-xs font-medium text-amber-800 mb-2">Защита ключа (рекомендуется):</p>
-              <ol className="text-xs text-amber-700 space-y-1 list-decimal list-inside">
-                <li>В Google Cloud Console перейдите в "Credentials"</li>
-                <li>Нажмите на ваш API ключ для редактирования</li>
-                <li>В разделе "Application restrictions" выберите <span className="font-medium">"HTTP referrers"</span></li>
-                <li>Добавьте домены: <code className="bg-amber-100 px-1 rounded">*.github.io/*</code> (для GitHub Pages) или ваш домен</li>
-                <li>В разделе "API restrictions" выберите <span className="font-medium">"Restrict key"</span></li>
-                <li>Выберите только: <span className="font-medium">Maps JavaScript API</span>, <span className="font-medium">Geocoding API</span></li>
-              </ol>
-              <p className="text-xs text-amber-600 mt-2">
-                Это защитит ключ от использования на других сайтах.
-              </p>
-              <p className="text-xs text-amber-700 mt-2 font-medium">
-                После игры рекомендуем пересоздать ключ в Google Console для безопасности.
-              </p>
+            <div className="mt-2 bg-amber-50 rounded-lg border border-amber-200 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setShowProtection(!showProtection)}
+                className="w-full p-3 flex items-center justify-between text-left hover:bg-amber-100 transition-colors"
+              >
+                <span className="text-xs font-medium text-amber-800">Защита ключа (рекомендуется)</span>
+                <span className={`text-amber-600 transition-transform ${showProtection ? 'rotate-180' : ''}`}>▼</span>
+              </button>
+              {showProtection && (
+                <div className="px-3 pb-3">
+                  <ol className="text-xs text-amber-700 space-y-1 list-decimal list-inside">
+                    <li>В Google Cloud Console перейдите в "Credentials"</li>
+                    <li>Нажмите на ваш API ключ для редактирования</li>
+                    <li>В разделе "Application restrictions" выберите <span className="font-medium">"HTTP referrers"</span></li>
+                    <li>Добавьте домены: <code className="bg-amber-100 px-1 rounded">*.github.io/*</code> (для GitHub Pages) или ваш домен</li>
+                    <li>В разделе "API restrictions" выберите <span className="font-medium">"Restrict key"</span></li>
+                    <li>Выберите только: <span className="font-medium">Maps JavaScript API</span>, <span className="font-medium">Geocoding API</span></li>
+                  </ol>
+                  <p className="text-xs text-amber-600 mt-2">
+                    Это защитит ключ от использования на других сайтах.
+                  </p>
+                  <p className="text-xs text-amber-700 mt-2 font-medium">
+                    После игры рекомендуем пересоздать ключ в Google Console для безопасности.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
