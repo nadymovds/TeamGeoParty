@@ -279,30 +279,12 @@ export const forceNextRound = mutation({
           }
         }
 
-        // Find next location
-        console.log("forceNextRound: Finding next location");
-        const currentIndex = shuffledLocations.findIndex(
-          (loc) => loc._id === game.activeLocationId
-        );
-
-        if (currentIndex !== -1 && currentIndex < shuffledLocations.length - 1) {
-          const nextLocation = shuffledLocations[currentIndex + 1];
-          console.log("forceNextRound: Moving to next round with location", nextLocation.hint);
-          // Start next round immediately (NO intermediate RESULTS status)
-          await ctx.db.patch(args.gameId, {
-            status: "PLAYING",
-            activeLocationId: nextLocation._id,
-            currentRound: (game.currentRound ?? 1) + 1,
-          });
-          console.log("forceNextRound: Successfully moved to next round");
-        } else {
-          console.log("forceNextRound: No more locations, finishing game");
-          // No more locations, finish game
-          await ctx.db.patch(args.gameId, {
-            status: "FINAL",
-          });
-          console.log("forceNextRound: Game finished");
-        }
+        // Transition to RESULTS to show the round results screen
+        console.log("forceNextRound: Transitioning to RESULTS");
+        await ctx.db.patch(args.gameId, {
+          status: "RESULTS",
+        });
+        console.log("forceNextRound: Successfully moved to RESULTS");
       } else if (game.status === "RESULTS") {
         console.log("forceNextRound: Processing RESULTS state");
         // Currently in RESULTS, move to next round
