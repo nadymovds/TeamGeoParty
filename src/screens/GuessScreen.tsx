@@ -100,9 +100,9 @@ export const GuessScreen: React.FC<GuessScreenProps> = ({ gameId }) => {
         </div>
 
         <div className="bg-white rounded-lg shadow-lg p-4 mb-4">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-4 sticky top-2 bg-white z-10 py-2 -mx-4 px-4 rounded-t-lg">
             <h2 className="text-xl font-semibold">Ваше предположение:</h2>
-            {game.timerEnd && !isHost && (
+            {game.timerEnd && (
               <Timer endTime={game.timerEnd} />
             )}
           </div>

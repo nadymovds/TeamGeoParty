@@ -33,22 +33,26 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
   }
 
   const handleForceNextRound = async () => {
-    // Check if all participating players have answered
+    // Check if all participating players have answered (only relevant during PLAYING)
     const participatingPlayers = players.filter(p => p.isParticipating);
     const playersWithGuesses = new Set(guesses?.map(g => g.playerId) || []);
     const playersWithoutGuesses = participatingPlayers.filter(p => !playersWithGuesses.has(p._id));
 
-    // Only show confirmation if there are players who haven't answered
-    if (playersWithoutGuesses.length > 0) {
+    // Only show confirmation if there are players who haven't answered (during PLAYING state)
+    if (game.status === "PLAYING" && playersWithoutGuesses.length > 0) {
       const playerNames = playersWithoutGuesses.map(p => p.name).join(", ");
       if (!confirm(
-        `Перейти к следующему раунду?\n\nИгроки без ответов (${playersWithoutGuesses.length}): ${playerNames}\nОни получат 0 очков.`
+        `Завершить раунд?\n\nИгроки без ответов (${playersWithoutGuesses.length}): ${playerNames}\nОни получат 0 очков.`
       )) {
         return;
       }
     }
 
     try {
+      // Stop timer when finishing round
+      if (game.status === "PLAYING" && game.timerEnd) {
+        await stopTimer({ gameId });
+      }
       await forceNextRound({ gameId });
     } catch (err) {
       alert(err instanceof Error ? err.message : "Ошибка перехода");
@@ -127,7 +131,7 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
                 onClick={handleForceNextRound}
                 className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md"
               >
-                Следующий раунд
+                {game.status === "PLAYING" ? "Завершить раунд" : "Следующий раунд"}
               </button>
 
               <button
