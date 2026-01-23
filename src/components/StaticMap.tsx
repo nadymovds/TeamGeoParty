@@ -133,7 +133,7 @@ export const StaticMap: React.FC<StaticMapProps> = ({
         />
       ) : (
         <div className="w-full h-full flex items-center justify-center">
-          <p className="text-gray-500">Загрузка карты...</p>
+          <p className="text-gray-500">Loading map...</p>
         </div>
       )}
     </div>

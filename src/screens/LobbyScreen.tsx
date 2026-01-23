@@ -31,13 +31,13 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
       setShowCopyToast(true);
       setTimeout(() => setShowCopyToast(false), 2000);
     } catch (err) {
-      alert("Не удалось скопировать ссылку");
+      alert("Failed to copy the link");
     }
   };
 
   const handleJoin = async () => {
     if (!playerName.trim()) {
-      setJoinError("Введите имя");
+      setJoinError("Enter name");
       return;
     }
     try {
@@ -49,7 +49,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
       setJoinError(null);
       setPlayerName("");
     } catch (err) {
-      setJoinError(err instanceof Error ? err.message : "Ошибка присоединения");
+      setJoinError(err instanceof Error ? err.message : "Join error");
     }
   };
 
@@ -57,7 +57,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
     try {
       await startSetup({ gameId });
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Ошибка запуска");
+      alert(err instanceof Error ? err.message : "Start error");
     }
   };
 
@@ -69,7 +69,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
         isParticipating: !currentPlayer.isParticipating,
       });
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Ошибка");
+      alert(err instanceof Error ? err.message : "Error");
     }
   };
 
@@ -77,7 +77,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
   if (!game || !players) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Загрузка...</div>
+        <div className="text-xl">Loading...</div>
       </div>
     );
   }
@@ -91,12 +91,12 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
         <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
           <h1 className="text-3xl font-bold mb-2">TeamGeo</h1>
           <p className="text-gray-600 mb-4">
-            Мультиплеерная игра команды
+            Team multiplayer game
           </p>
 
           <div className="bg-blue-50 p-4 rounded-lg mb-4">
             <p className="text-sm font-medium text-gray-700 mb-2">
-              Пригласите друзей по ссылке:
+              Invite friends via link:
             </p>
             <div className="flex gap-2 relative">
               <input
@@ -110,12 +110,12 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
                 onClick={handleCopyLink}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 hover:shadow-md active:bg-blue-800 transition-all duration-150"
               >
-                Копировать
+                Copy
               </button>
             </div>
             {showCopyToast && (
               <div className="mt-2 py-2 px-3 bg-blue-100 text-blue-700 text-sm rounded-lg border border-blue-300">
-                Ссылка скопирована в буфер обмена
+                Link copied to clipboard
               </div>
             )}
           </div>
@@ -123,21 +123,21 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
 
         {!currentPlayer && (
           <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
-            <h2 className="text-xl font-semibold mb-4">Присоединиться к игре</h2>
+            <h2 className="text-xl font-semibold mb-4">Join the game</h2>
             <div className="flex gap-2">
               <input
                 type="text"
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && handleJoin()}
-                placeholder="Ваше имя"
+                placeholder="Your name"
                 className="flex-1 px-4 py-2 border rounded-lg"
               />
               <button
                 onClick={handleJoin}
                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
-                Присоединиться
+                Join
               </button>
             </div>
             {joinError && (
@@ -161,7 +161,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
                   onChange={handleToggleParticipating}
                   className="w-5 h-5"
                 />
-                <span className="text-gray-700">Я буду участвовать в игре (добавлять локации и угадывать)</span>
+                <span className="text-gray-700">I will participate in the game (add locations and guess)</span>
               </label>
             </div>
 
@@ -171,8 +171,8 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({ gameId }) => {
               className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               {players.length < 2
-                ? "Нужно минимум 2 игрока"
-                : "Начать настройку локаций"}
+                ? "Need at least 2 players"
+                : "Start location setup"}
             </button>
 
           </div>

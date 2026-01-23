@@ -16,7 +16,7 @@ interface MapMarker {
   lat: number;
   lng: number;
   label?: string;
-  title?: string; // Подпись под маркером
+  title?: string; // Marker label
   color?: "red" | "green" | "blue"; // Marker color
 }
 
@@ -101,7 +101,7 @@ export const Map: React.FC<MapProps> = ({
   if (loadError) {
     return (
       <div style={containerStyle} className="bg-red-50 rounded flex items-center justify-center">
-        <p className="text-red-600">Ошибка загрузки Google Maps</p>
+        <p className="text-red-600">Error loading Google Maps</p>
       </div>
     );
   }
@@ -109,7 +109,7 @@ export const Map: React.FC<MapProps> = ({
   if (!isLoaded) {
     return (
       <div style={containerStyle} className="bg-gray-100 rounded flex items-center justify-center">
-        <p className="text-gray-500">Загрузка карты...</p>
+        <p className="text-gray-500">Loading map...</p>
       </div>
     );
   }

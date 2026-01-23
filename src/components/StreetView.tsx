@@ -68,7 +68,7 @@ export const StreetView: React.FC<StreetViewProps> = ({ lat, lng }) => {
   if (loadError) {
     return (
       <div style={containerStyle} className="bg-red-50 rounded flex items-center justify-center">
-        <p className="text-red-600">Ошибка загрузки Street View</p>
+        <p className="text-red-600">Error loading Street View</p>
       </div>
     );
   }
@@ -76,7 +76,7 @@ export const StreetView: React.FC<StreetViewProps> = ({ lat, lng }) => {
   if (!isLoaded) {
     return (
       <div style={containerStyle} className="bg-gray-100 rounded flex items-center justify-center">
-        <p className="text-gray-500">Загрузка карты...</p>
+        <p className="text-gray-500">Loading map...</p>
       </div>
     );
   }
@@ -86,14 +86,14 @@ export const StreetView: React.FC<StreetViewProps> = ({ lat, lng }) => {
       <div ref={streetViewRef} style={containerStyle} className="rounded" />
       {status === "loading" && (
         <div className="absolute inset-0 bg-gray-100 rounded flex items-center justify-center">
-          <p className="text-gray-500">Загрузка панорамы...</p>
+          <p className="text-gray-500">Loading panorama...</p>
         </div>
       )}
       {status === "no_coverage" && (
         <div className="absolute inset-0 bg-yellow-50 rounded flex items-center justify-center">
           <p className="text-yellow-700 text-center px-4">
-            В этой точке нет Street View панорамы.<br />
-            Попробуйте выбрать другое место ближе к дороге.
+            There is no Street View panorama at this location.<br />
+            Try selecting another location closer to the road.
           </p>
         </div>
       )}

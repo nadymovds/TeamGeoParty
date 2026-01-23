@@ -42,7 +42,7 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
     if (game.status === "PLAYING" && playersWithoutGuesses.length > 0) {
       const playerNames = playersWithoutGuesses.map(p => p.name).join(", ");
       if (!confirm(
-        `Завершить раунд?\n\nИгроки без ответов (${playersWithoutGuesses.length}): ${playerNames}\nОни получат 0 очков.`
+        `Finish the round?\n\nPlayers without answers (${playersWithoutGuesses.length}): ${playerNames}\nThey will get 0 points.`
       )) {
         return;
       }
@@ -55,16 +55,16 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
       }
       await forceNextRound({ gameId });
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Ошибка перехода");
+      alert(err instanceof Error ? err.message : "Transition error");
     }
   };
 
   const handleForceFinish = async () => {
-    if (confirm("Завершить игру?\n\nИгра будет завершена и откроется таблица финальных результатов.")) {
+    if (confirm("Finish the game?\n\nThe game will be finished and the final results table will open.")) {
       try {
         await forceFinishGame({ gameId });
       } catch (err) {
-        alert(err instanceof Error ? err.message : "Ошибка завершения");
+        alert(err instanceof Error ? err.message : "Completion error");
       }
     }
   };
@@ -73,17 +73,17 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
     const participatingPlayers = players.filter(p => p.isParticipating);
     const notReadyPlayers = participatingPlayers.filter(p => !p.isReady);
 
-    let message = "Начать игру принудительно?";
+    let message = "Start the game forcibly?";
     if (notReadyPlayers.length > 0) {
       const playerNames = notReadyPlayers.map(p => p.name).join(", ");
-      message = `Начать игру принудительно?\n\nНе готовы (${notReadyPlayers.length}): ${playerNames}\n\nИгроки без локаций не смогут участвовать в угадывании своих мест.`;
+      message = `Start the game forcibly?\n\nNot ready (${notReadyPlayers.length}): ${playerNames}\n\nPlayers without locations will not be able to participate in guessing their places.`;
     }
 
     if (confirm(message)) {
       try {
         await forceStartGame({ gameId });
       } catch (err) {
-        alert(err instanceof Error ? err.message : "Ошибка запуска игры");
+        alert(err instanceof Error ? err.message : "Game start error");
       }
     }
   };
@@ -100,7 +100,7 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
   return (
     <div className="fixed right-0 top-0 h-screen w-80 bg-white shadow-2xl border-l border-gray-200 flex flex-col z-50">
       <div className="p-4 border-b border-gray-200 bg-blue-600">
-        <h2 className="text-xl font-bold text-white">Панель хоста</h2>
+        <h2 className="text-xl font-bold text-white">Host panel</h2>
         <p className="text-sm text-blue-100">{game.status}</p>
         {game.timerEnd && (
           <div className="mt-2">
@@ -113,7 +113,7 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
         {/* Control Buttons */}
         <div className="space-y-2">
           <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-            Управление
+            Control
           </h3>
 
           {game.status === "SETUP" && (
@@ -121,7 +121,7 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
               onClick={handleForceStartGame}
               className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md"
             >
-              Начать игру
+              Start game
             </button>
           )}
 
@@ -131,14 +131,14 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
                 onClick={handleForceNextRound}
                 className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md"
               >
-                {game.status === "PLAYING" ? "Завершить раунд" : "Следующий раунд"}
+                {game.status === "PLAYING" ? "Finish round" : "Next round"}
               </button>
 
               <button
                 onClick={handleForceFinish}
                 className="w-full px-4 py-2 bg-white text-blue-600 border-2 border-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-colors"
               >
-                Завершить игру
+                Finish game
               </button>
             </>
           )}
@@ -148,26 +148,26 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
         {(game.status === "SETUP" || game.status === "PLAYING") && (
           <div className="space-y-2">
             <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-              Таймер
+              Timer
             </h3>
             <div className="grid grid-cols-3 gap-2">
               <button
                 onClick={() => startTimer({ gameId, durationSeconds: 60 })}
                 className="px-2 py-2 bg-green-600 text-white rounded text-sm font-medium hover:bg-green-700 transition-colors"
               >
-                1 мин
+                1 min
               </button>
               <button
                 onClick={() => startTimer({ gameId, durationSeconds: 120 })}
                 className="px-2 py-2 bg-green-600 text-white rounded text-sm font-medium hover:bg-green-700 transition-colors"
               >
-                2 мин
+                2 min
               </button>
               <button
                 onClick={() => startTimer({ gameId, durationSeconds: 240 })}
                 className="px-2 py-2 bg-green-600 text-white rounded text-sm font-medium hover:bg-green-700 transition-colors"
               >
-                4 мин
+                4 min
               </button>
             </div>
             {game.timerEnd && (
@@ -176,19 +176,19 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
                   onClick={() => addTimeToTimer({ gameId, additionalSeconds: 30 })}
                   className="flex-1 px-2 py-2 bg-yellow-600 text-white rounded text-sm font-medium hover:bg-yellow-700 transition-colors"
                 >
-                  +30с
+                  +30s
                 </button>
                 <button
                   onClick={() => addTimeToTimer({ gameId, additionalSeconds: 60 })}
                   className="flex-1 px-2 py-2 bg-yellow-600 text-white rounded text-sm font-medium hover:bg-yellow-700 transition-colors"
                 >
-                  +1м
+                  +1m
                 </button>
                 <button
                   onClick={() => stopTimer({ gameId })}
                   className="flex-1 px-2 py-2 bg-red-600 text-white rounded text-sm font-medium hover:bg-red-700 transition-colors"
                 >
-                  Стоп
+                  Stop
                 </button>
               </div>
             )}
@@ -198,7 +198,7 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
         {/* Player List */}
         <div className="space-y-2">
           <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
-            Игроки ({players.length})
+            Players ({players.length})
           </h3>
 
           <div className="space-y-2">
@@ -217,14 +217,14 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
                         className={`w-2 h-2 rounded-full ${
                           online ? "bg-green-500" : "bg-red-500"
                         }`}
-                        title={online ? "Онлайн" : "Офлайн"}
+                        title={online ? "Online" : "Offline"}
                       />
                       <span className="font-medium text-gray-900">
                         {player.name}
                       </span>
                       {player.isHost && (
                         <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
-                          Хост
+                          Host
                         </span>
                       )}
                     </div>
@@ -232,7 +232,7 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
 
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">
-                      Очки: <span className="font-semibold">{player.totalScore}</span>
+                      Points: <span className="font-semibold">{player.totalScore}</span>
                     </span>
 
                     {game.status === "SETUP" && (
@@ -243,7 +243,7 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
                             : "text-yellow-600"
                         }`}
                       >
-                        {player.isReady ? "✓ Готов" : "⏳ Настройка"}
+                        {player.isReady ? "✓ Ready" : "⏳ Setup"}
                       </span>
                     )}
 
@@ -253,7 +253,7 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
                           playerGuess ? "text-green-600" : "text-yellow-600"
                         }`}
                       >
-                        {playerGuess ? "✓ Ответил" : "⏳ Думает"}
+                        {playerGuess ? "✓ Answered" : "⏳ Thinking"}
                       </span>
                     )}
 
@@ -261,8 +261,8 @@ export const HostMenu: React.FC<HostMenuProps> = ({ gameId }) => {
                       playerGuess && (
                         <span className="text-xs text-gray-500">
                           {playerGuess.distance < 1
-                            ? `${Math.round(playerGuess.distance * 1000)} м`
-                            : `${playerGuess.distance.toFixed(1)} км`}
+                            ? `${Math.round(playerGuess.distance * 1000)} m`
+                            : `${playerGuess.distance.toFixed(1)} km`}
                         </span>
                       )}
                   </div>

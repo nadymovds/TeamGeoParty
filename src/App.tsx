@@ -31,7 +31,7 @@ const GameContent: React.FC<{ gameId: Id<"games"> }> = ({ gameId }) => {
   if (!game) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Загрузка игры...</div>
+        <div className="text-xl">Loading game...</div>
       </div>
     );
   }
@@ -45,7 +45,7 @@ const GameContent: React.FC<{ gameId: Id<"games"> }> = ({ gameId }) => {
   if (apiKey === undefined) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Загрузка игры...</div>
+        <div className="text-xl">Loading game...</div>
       </div>
     );
   }
@@ -54,7 +54,7 @@ const GameContent: React.FC<{ gameId: Id<"games"> }> = ({ gameId }) => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-xl text-red-600">
-          Ошибка: нет доступа к игре. Присоединитесь через ссылку от хоста.
+          Error: no access to the game. Join via the link from the host.
         </div>
       </div>
     );
@@ -186,7 +186,7 @@ const GameContentInner: React.FC<GameContentInnerProps> = ({ game, gameId }) => 
       default:
         return (
           <div className="min-h-screen flex items-center justify-center">
-            <div className="text-xl">Неизвестный статус игры</div>
+            <div className="text-xl">Unknown game status</div>
           </div>
         );
     }

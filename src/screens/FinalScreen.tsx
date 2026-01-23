@@ -27,7 +27,7 @@ export const FinalScreen: React.FC<FinalScreenProps> = ({ gameId }) => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-xl">
-          {!isLoaded ? "Загрузка карт..." : "Загрузка..."}
+          {!isLoaded ? "Loading maps..." : "Loading..."}
         </div>
       </div>
     );
@@ -45,7 +45,7 @@ export const FinalScreen: React.FC<FinalScreenProps> = ({ gameId }) => {
         return {
           lat: guess.lat,
           lng: guess.lng,
-          title: `${player?.name ?? "Игрок"}: ${location?.hint ?? ""}`,
+          title: `${player?.name ?? "Player"}: ${location?.hint ?? ""}`,
           color: "red" as const,
         };
       }),
@@ -54,7 +54,7 @@ export const FinalScreen: React.FC<FinalScreenProps> = ({ gameId }) => {
       return {
         lat: loc.lat,
         lng: loc.lng,
-        title: `${loc.hint} (${player?.name ?? "Игрок"})`,
+        title: `${loc.hint} (${player?.name ?? "Player"})`,
         color: "green" as const,
       };
     }),
@@ -72,18 +72,18 @@ export const FinalScreen: React.FC<FinalScreenProps> = ({ gameId }) => {
     <div className={`min-h-screen bg-gray-50 p-4 ${isHost ? 'mr-80' : ''}`}>
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-8 mb-6 text-center">
-          <h1 className="text-4xl font-bold mb-4">Игра завершена</h1>
+          <h1 className="text-4xl font-bold mb-4">Game finished</h1>
           <p className="text-xl text-gray-600 mb-6">
-            Спасибо за игру! Вот финальные результаты:
+            Thank you for playing! Here are the final results:
           </p>
         </div>
 
         <ScoreTable players={players} showAll={isHost} />
 
         <div className="mt-6 bg-white rounded-lg shadow-lg p-4">
-          <h3 className="text-xl font-bold mb-4">Все локации игры</h3>
+          <h3 className="text-xl font-bold mb-4">All game locations</h3>
           <p className="text-sm text-gray-500 mb-3">
-            Зеленые маркеры — правильные места, красные — предположения игроков
+            Green markers — correct locations, red — player guesses
           </p>
           <StaticMap
             center={mapCenter}
@@ -95,10 +95,10 @@ export const FinalScreen: React.FC<FinalScreenProps> = ({ gameId }) => {
         {isHost && (
           <div className="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
             <p className="text-sm text-amber-800 font-medium mb-2">
-              Рекомендация по безопасности:
+              Security recommendation:
             </p>
             <p className="text-sm text-amber-700">
-              Пересоздайте API ключ в{" "}
+              Recreate the API key in{" "}
               <a
                 href="https://console.cloud.google.com/apis/credentials"
                 target="_blank"
@@ -107,7 +107,7 @@ export const FinalScreen: React.FC<FinalScreenProps> = ({ gameId }) => {
               >
                 Google Cloud Console
               </a>
-              , чтобы исключить его дальнейшее использование другими игроками.
+              to prevent its further use by other players.
             </p>
           </div>
         )}
@@ -119,7 +119,7 @@ export const FinalScreen: React.FC<FinalScreenProps> = ({ gameId }) => {
             }}
             className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700"
           >
-            Создать новую игру
+            Create a new game
           </button>
         </div>
       </div>

@@ -74,7 +74,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
         setShowStreetViewCoverage(true);
         setSearchAddress("");
       } else {
-        alert("Адрес не найден");
+        alert("Address not found");
       }
     });
   };
@@ -95,7 +95,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
       setSelectedLocation(null);
       setHint("");
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Ошибка добавления локации");
+      alert(err instanceof Error ? err.message : "Error adding location");
     }
   };
 
@@ -104,7 +104,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
       try {
         await removeLocation({ locationId });
       } catch (err) {
-        alert(err instanceof Error ? err.message : "Ошибка удаления");
+        alert(err instanceof Error ? err.message : "Deletion error");
       }
     }
   };
@@ -117,7 +117,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
         isReady: !currentPlayer.isReady,
       });
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Ошибка");
+      alert(err instanceof Error ? err.message : "Error");
     }
   };
 
@@ -125,7 +125,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-xl">
-          {!isLoaded ? "Загрузка карт..." : "Загрузка..."}
+          {!isLoaded ? "Loading maps..." : "Loading..."}
         </div>
       </div>
     );
@@ -143,9 +143,9 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
         <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold mb-2">Настройка локаций</h1>
+              <h1 className="text-3xl font-bold mb-2">Location setup</h1>
               <p className="text-gray-600 mb-4">
-                Добавьте {locationsNeeded} значимых для вас мест на карте
+                Add {locationsNeeded} meaningful places for you on the map
               </p>
             </div>
             {game.timerEnd && (
@@ -158,7 +158,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
           <div className="lg:col-span-2 space-y-4">
             <div className="bg-white rounded-lg shadow-lg p-4">
               <h2 className="text-xl font-semibold mb-4">
-                Добавить локацию ({locationsCount}/{locationsNeeded})
+                Add location ({locationsCount}/{locationsNeeded})
               </h2>
 
               <div className="flex gap-2 mb-3">
@@ -166,7 +166,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
                   type="text"
                   value={searchAddress}
                   onChange={(e) => setSearchAddress(e.target.value)}
-                  placeholder="Поиск по адресу..."
+                  placeholder="Search by address..."
                   className="flex-1 px-3 py-2 border rounded-lg text-sm"
                   onKeyDown={(e) => e.key === "Enter" && handleSearchAddress()}
                 />
@@ -175,13 +175,13 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
                   disabled={!searchAddress.trim() || isSearching}
                   className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:bg-gray-400 text-sm"
                 >
-                  {isSearching ? "..." : "Найти"}
+                  {isSearching ? "..." : "Find"}
                 </button>
               </div>
 
               <div className="flex items-center justify-end mb-2">
                 <label className="flex items-center cursor-pointer">
-                  <span className="text-sm text-gray-600 mr-2">Покрытие Street View</span>
+                  <span className="text-sm text-gray-600 mr-2">Street View coverage</span>
                   <div className="relative">
                     <input
                       type="checkbox"
@@ -210,7 +210,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
 
               {selectedLocation && (
                 <div className="mt-4">
-                  <h3 className="text-lg font-semibold mb-2">Предпросмотр панорамы:</h3>
+                  <h3 className="text-lg font-semibold mb-2">Panorama preview:</h3>
                   <StreetView
                     lat={selectedLocation.lat}
                     lng={selectedLocation.lng}
@@ -224,7 +224,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
                     type="text"
                     value={hint}
                     onChange={(e) => setHint(e.target.value)}
-                    placeholder="Подсказка (например: Где я провел детство)"
+                    placeholder="Hint (e.g.: Where I spent my childhood)"
                     className="w-full px-4 py-2 border rounded-lg"
                     onKeyPress={(e) => e.key === "Enter" && handleAddLocation()}
                   />
@@ -233,11 +233,11 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
                     disabled={!hint.trim() || locationsCount >= locationsNeeded || !hasPanorama || checkingPanorama}
                     className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
                   >
-                    {checkingPanorama ? "Проверка панорамы..." : "Добавить локацию"}
+                    {checkingPanorama ? "Checking panorama..." : "Add location"}
                   </button>
                   {hasPanorama === false && (
                     <p className="text-sm text-red-600 mt-1">
-                      В этой точке нет панорамы Street View. Выберите другое место ближе к дороге.
+                      There is no Street View panorama at this point. Choose another location closer to the road.
                     </p>
                   )}
                 </div>
@@ -245,7 +245,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
 
               {selectedLocation && (
                 <p className="text-sm text-gray-500 mt-2">
-                  Координаты: {selectedLocation.lat.toFixed(4)},{" "}
+                  Coordinates: {selectedLocation.lat.toFixed(4)},{" "}
                   {selectedLocation.lng.toFixed(4)}
                 </p>
               )}
@@ -253,7 +253,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
 
             {locationsCount > 0 && (
               <div className="bg-white rounded-lg shadow-lg p-4">
-                <h3 className="text-lg font-semibold mb-2">Ваши локации:</h3>
+                <h3 className="text-lg font-semibold mb-2">Your locations:</h3>
                 <div className="space-y-2">
                   {myLocations?.map((loc) => (
                     <div
@@ -271,7 +271,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
                           onClick={() => handleRemoveLocation(loc._id)}
                           className="ml-2 px-3 py-1 bg-white text-blue-600 border border-blue-600 rounded hover:bg-blue-50 text-sm"
                         >
-                          Удалить
+                          Delete
                         </button>
                       )}
                     </div>
@@ -294,7 +294,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
                       : "bg-blue-600 text-white hover:bg-blue-700"
                   }`}
                 >
-                  {currentPlayer.isReady ? "Не готов" : "Готов к игре"}
+                  {currentPlayer.isReady ? "Not ready" : "Ready to play"}
                 </button>
               </div>
             )}
@@ -302,7 +302,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({ gameId }) => {
             {allReady && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <p className="text-center text-blue-700 font-semibold">
-                  Все игроки готовы! Игра начнется автоматически...
+                  All players are ready! The game will start automatically...
                 </p>
               </div>
             )}

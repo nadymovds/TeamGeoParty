@@ -23,7 +23,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({
   return (
     <div className="bg-white rounded-lg shadow p-4">
       <h3 className="text-lg font-semibold mb-3">
-        Игроки (готово {readyCount}/{players.length})
+        Players (ready {readyCount}/{players.length})
       </h3>
       <div className="space-y-2">
         {players.map((player) => (
@@ -37,16 +37,16 @@ export const PlayerList: React.FC<PlayerListProps> = ({
               <span className="font-medium">{player.name}</span>
               {player.isHost && (
                 <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                  Хост
+                  Host
                 </span>
               )}
             </div>
             <div className="flex items-center gap-2">
               {player.isReady && (
-                <span className="text-blue-600 text-sm">Готов</span>
+                <span className="text-blue-600 text-sm">Ready</span>
               )}
               <span className="text-gray-600 text-sm">
-                {player.totalScore} очков
+                {player.totalScore} points
               </span>
             </div>
           </div>

@@ -32,7 +32,7 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-xl">
-          {!isLoaded ? "Загрузка карт..." : "Загрузка..."}
+          {!isLoaded ? "Loading maps..." : "Loading..."}
         </div>
       </div>
     );
@@ -47,14 +47,14 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
         return {
           lat: guess.lat,
           lng: guess.lng,
-          title: player?.name ?? "Игрок",
+          title: player?.name ?? "Player",
           color: "red" as const,
         };
       }),
     {
       lat: activeLocation.lat,
       lng: activeLocation.lng,
-      title: "Правильное место",
+      title: "Correct location",
       color: "green" as const,
     },
   ];
@@ -82,18 +82,18 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
           <h1 className="text-3xl font-bold mb-2">
-            Результаты раунда {game.currentRound ?? 1}
+            Results of round {game.currentRound ?? 1}
           </h1>
           <p className="text-xl text-gray-700 mb-2 font-medium">
-            Подсказка от {locationAuthor?.name ?? "Игрока"}: «{activeLocation.hint}»
+            Hint from {locationAuthor?.name ?? "Player"}: «{activeLocation.hint}»
           </p>
           <p className="text-sm text-gray-500">
-            Правильное место отмечено зеленым маркером на карте
+            The correct location is marked with a green marker on the map
           </p>
         </div>
 
         <div className="bg-white rounded-lg shadow-lg p-4 mb-4">
-          <h2 className="text-lg font-semibold mb-3">Панорама:</h2>
+          <h2 className="text-lg font-semibold mb-3">Panorama:</h2>
           <StreetView lat={activeLocation.lat} lng={activeLocation.lng} />
         </div>
 
@@ -107,7 +107,7 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
           </div>
 
           <div className="bg-white rounded-lg shadow-lg p-4">
-            <h3 className="text-lg font-semibold mb-4">Результаты игроков</h3>
+              <h3 className="text-lg font-semibold mb-3">Player results</h3>
             <div className="space-y-2">
               {playerResults.map(({ player, guess }, index) => (
                 <div
@@ -128,10 +128,10 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
                       <span className="text-sm text-gray-600">
                         {guess ? (
                           guess.distance < 1
-                            ? `${Math.round(guess.distance * 1000)} м`
-                            : `${guess.distance.toFixed(2)} км`
+                            ? `${Math.round(guess.distance * 1000)} m`
+                            : `${guess.distance.toFixed(2)} km`
                         ) : (
-                          "Не угадывал"
+                          "Didn't guess"
                         )}
                       </span>
                     </div>
@@ -147,7 +147,7 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({
         {!isHost && (
           <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
             <p className="text-center text-blue-700">
-              Ожидание следующего раунда от хоста...
+              Waiting for the next round from the host...
             </p>
           </div>
         )}

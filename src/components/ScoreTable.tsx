@@ -23,7 +23,7 @@ export const ScoreTable: React.FC<ScoreTableProps> = ({ players, showAll = false
 
   return (
     <div className="bg-white rounded-lg shadow p-4">
-      <h3 className="text-xl font-bold mb-4">Таблица лидеров</h3>
+      <h3 className="text-xl font-bold mb-4">Leaderboard</h3>
       <div className="space-y-2">
         {displayPlayers.map((player, index) => (
           <div
@@ -40,12 +40,12 @@ export const ScoreTable: React.FC<ScoreTableProps> = ({ players, showAll = false
               </span>
               <span className="font-medium text-lg">{player.name}</span>
             </div>
-            <span className="font-bold text-lg">{player.totalScore} очков</span>
+            <span className="font-bold text-lg">{player.totalScore} points</span>
           </div>
         ))}
         {hasMorePlayers && (
           <div className="text-center text-gray-500 text-sm pt-2">
-            и еще {sortedPlayers.length - 3} игроков...
+            and {sortedPlayers.length - 3} more players...
           </div>
         )}
       </div>
