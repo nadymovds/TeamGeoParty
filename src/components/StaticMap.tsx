@@ -109,9 +109,14 @@ export const StaticMap: React.FC<StaticMapProps> = ({
     // Build URL manually to handle multiple markers params
     let url = `https://maps.googleapis.com/maps/api/staticmap?${params.toString()}`;
 
-    Object.entries(markersByColor).forEach(([color, colorMarkers]) => {
-      const locations = colorMarkers.map((m) => `${m.lat},${m.lng}`).join("|");
-      url += `&markers=color:${color}|${locations}`;
+    // Define color order: red markers first, green on top
+    const colorOrder = ['red', 'green', 'blue'];
+    colorOrder.forEach((color) => {
+      if (markersByColor[color]) {
+        const colorMarkers = markersByColor[color];
+        const locations = colorMarkers.map((m) => `${m.lat},${m.lng}`).join("|");
+        url += `&markers=color:${color}|${locations}`;
+      }
     });
 
     return url;
